@@ -34,6 +34,12 @@ class User extends Authenticatable implements FilamentUser, HasTenants, MustVeri
         'email_verified_at' => 'datetime',
     ];
 
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
