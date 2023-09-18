@@ -6,6 +6,89 @@ Génération de bon de livraison et autres
 
 ![Aquaphoenix - Light Mode](https://firebasestorage.googleapis.com/v0/b/dashboard-f3222.appspot.com/o/Tableau%20de%20bord%20-%20Aquaphoenix2.png?alt=media&token=a81f2292-a680-418f-a85e-530dda6b6662)
 
-[Github](https://aquaphoenix.jsprod.fr/) Lien du projet.
+[Aquaphoenix](https://aquaphoenix.jsprod.fr/) Lien du projet.
 
-[Github](https://github.com/steeven-js/aquaphoenix) Le projet sur gitHub.
+## Version 1.0.0 - Date 17/07/2023
+
+### Ajouts
+
+- Création initiale de l'application Aquaphoenix.
+- Mise en place du tableau de bord personnalisé pour la gestion des bons de livraison et des produits.
+- Intégration de la génération automatisée de bons de livraison.
+- Ajout de la fonctionnalité de gestion des clients.
+- Intégration de la génération de PDF pour les bons de livraison.
+- Mise en place de la liste de livraison dédiée.
+
+### Modifications
+
+- Refonte de l'interface utilisateur pour une expérience conviviale.
+- Amélioration des performances pour une utilisation fluide.
+- Optimisation de la génération de PDF pour une meilleure qualité d'impression.
+
+### Corrections
+
+- Correction de bugs mineurs liés à la saisie des données des clients.
+- Résolution d'un problème de mise en page sur la liste de livraison.
+
+## Version 1.1.0 - Date 24/07/2023
+
+### Ajouts
+
+- Ajout de la section "À Propos" pour partager l'histoire du développement d'Aquaphoenix.
+- Intégration d'une documentation complète pour guider les utilisateurs dans l'utilisation de l'application.
+- Lien vers les profils LinkedIn et GitHub du développeur ajouté à la page "À Propos".
+
+### Modifications
+
+- Mise à jour de l'interface utilisateur avec de nouveaux éléments visuels.
+- Amélioration de la convivialité de l'interface de génération de PDF.
+- Optimisation des performances pour une navigation plus rapide.
+
+### Corrections
+
+- Correction d'un bug lié à l'affichage des dates de livraison dans certaines circonstances.
+
+## Version 1.1.1 - 21/08/2023
+
+### Ajouts
+
+- Filament : widget Nombre de client
+- Filament : widget Nombre de livraisons cette année
+- Filament : widget Nombre de livraisons le mois dernier
+- Filament : widget Livraisons par mois
+- Filament : widget Total kg
+
+### Modifications
+
+- Refonte db Articles / Tarifs
+
+### Corrections
+
+- Interface par défaut : Suppression de la barre recherche.
+- Interface par défaut : Correction de l'agencement des liens + icones de la sidebar
+
+Bien sûr, voici une version améliorée de votre texte :
+
+## Version 1.1.2 - 28/08/2023
+
+### Ajouts
+
+- Intégration de la fonctionnalité d'enregistrement des livraisons dans la base de données.
+- Mise en place de l'envoi automatique des notifications par e-mail pour les livraisons individuelles en utilisant Mailtrap.
+- Mise en place de l'envoi automatique des récapitulatifs hebdomadaires des livraisons par e-mail via Mailtrap.
+- Mise en place de l'envoi automatique des récapitulatifs mensuels des livraisons par e-mail via Mailtrap.
+
+### Corrections
+
+- Préparation à la mise à jour future de l'interface utilisateur.
+
+Bien sûr, voici une version améliorée de votre texte :
+
+## Version 1.2 - 06/09/2023
+
+### Nouveautés
+
+- Introduction d'une toute nouvelle interface utilisateur, offrant une expérience améliorée et conviviale.
+- Amélioration des fonctionnalités de suivi des livraisons.
+- Intégration de nouvelles options de personnalisation pour les utilisateurs.
+- Mise à jour de la documentation pour refléter les changements de l'interface.
