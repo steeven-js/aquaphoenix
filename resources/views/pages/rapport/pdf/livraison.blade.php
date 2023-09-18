@@ -118,7 +118,7 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="{{ public_path('logo.png') }}" style="width: 100%; max-width: 100px" />
+                                <img src="{{ public_path('images/logo.png') }}" style="width: 100%; max-width: 100px" />
                             </td>
 
                             <td>
