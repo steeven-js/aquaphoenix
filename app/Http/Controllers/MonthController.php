@@ -7,6 +7,7 @@ use App\Models\Month;
 use App\Models\Shop\Order;
 use App\Models\OrderByMonth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class MonthController extends Controller
 {
@@ -61,6 +62,8 @@ class MonthController extends Controller
         }
 
         $this->fillOrdersByMonth();
+
+        return Redirect::route('filament.admin.pages.dashboard');
     }
 
     // Méthode pour obtenir le nombre d'orders pour un mois donné

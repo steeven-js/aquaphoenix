@@ -19,6 +19,7 @@ class OrderProductsSeeder extends Seeder
         $order_products->slug = 'laver-secher';
         $order_products->description = NULL;
         $order_products->is_visible = 1;
+        $order_products->published_at = '2023-08-01';
         $order_products->timestamps = true;
         $order_products->save();
     }
