@@ -58,17 +58,6 @@ Génération de bon de livraison et autres
 - Filament : widget Livraisons par mois
 - Filament : widget Total kg
 
-### Modifications
-
-- Refonte db Articles / Tarifs
-
-### Corrections
-
-- Interface par défaut : Suppression de la barre recherche.
-- Interface par défaut : Correction de l'agencement des liens + icones de la sidebar
-
-Bien sûr, voici une version améliorée de votre texte :
-
 ## Version 1.1.2 - 28/08/2023
 
 ### Ajouts
@@ -81,8 +70,6 @@ Bien sûr, voici une version améliorée de votre texte :
 ### Corrections
 
 - Préparation à la mise à jour future de l'interface utilisateur.
-
-Bien sûr, voici une version améliorée de votre texte :
 
 ## Version 1.2 - 06/09/2023
 
