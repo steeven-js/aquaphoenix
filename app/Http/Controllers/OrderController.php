@@ -92,8 +92,8 @@ class OrderController extends Controller
         $storage = $result['storage']; // Je récupère le chemin du stockage
         $url = $result['url']; // Je récupère l'url du PDF
 
-        Mail::to('liana.jacques@aquaphoenix.fr')
-            ->cc(['jacques.steeven@gmail.com'])
+        Mail::to('lianajacques18@gmail.com')
+            ->cc(['liana.jacques@aquaphoenix.fr','jacques.steeven@gmail.com'])
             ->send(new LivraisonMail($mailData, $storage, $url));
 
         // Marquez la commande comme rapport envoyé avec succès

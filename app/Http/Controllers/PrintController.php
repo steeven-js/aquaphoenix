@@ -8,6 +8,7 @@ use App\Models\Shop\Product;
 use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Filament\Notifications\Notification;
 
 class PrintController extends Controller
 {
@@ -315,6 +316,12 @@ class PrintController extends Controller
             $MonthTable->report_created_at = Carbon::now();
             $MonthTable->save(); // Enregistrez les modifications dans la base de données
         }
+
+        Notification::make()
+        ->title('Nouvelle commande')
+        ->icon('heroicon-o-shopping-bag')
+        ->body("** Rapport du mois {$monthName} créé le {$MonthTable->report_created_at} **")
+        ->sendToDatabase(auth()->user());
 
         return $pdf->stream('orders_by_month.pdf');
     }
