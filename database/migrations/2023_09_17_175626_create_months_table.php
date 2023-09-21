@@ -21,6 +21,7 @@ return new class extends Migration
 
             $table->integer('count')->default(0)->nullable();
             $table->boolean('report_status')->nullable();
+            $table->timestamp('report_created_at')->nullable();
             $table->timestamps();
         });
     }
