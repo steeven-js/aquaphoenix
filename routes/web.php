@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     })->middleware(['auth', 'verified'])->name('dashboard');
 
     Route::get('/print/order/{id}', [PrintController::class, 'printOrder'])->name('order.print');
+    Route::get('/print/month/{month}/{year}', [PrintController::class, 'ordersByMonth'])->name('order.month.print');
     Route::get('/email/livraison-mail/{order}', [OrderController::class, 'livraisonMail'])->name('livraison.mail');
 
     Route::get('/test/month', [MonthController::class, 'month'])->name('month.test');

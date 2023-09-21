@@ -78,7 +78,17 @@ class MonthResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Envoyer mail')
+                        ->icon('heroicon-o-envelope'),
+                    Tables\Actions\Action::make('Imprimer')
+                        ->icon('heroicon-o-document-arrow-up')
+                        ->url(fn (Month $record): string => route('order.month.print', [
+                            'month' => $record->month_number,
+                            'year' => $record->year,
+                        ])),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

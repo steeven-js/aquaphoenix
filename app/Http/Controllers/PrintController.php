@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Month;
 use App\Models\Shop\Order;
 use App\Models\Shop\Product;
 use Illuminate\Support\Carbon;
@@ -209,7 +209,7 @@ class PrintController extends Controller
      * @param int $year L'année pour laquelle vous souhaitez générer le PDF.
      * @return \Illuminate\Http\Response
      */
-    public function ordersByMonth($year, $month)
+    public function ordersByMonth($month, $year)
     {
         // Récupérer les commandes du mois et de l'année spécifiés
         $orders = Order::with('customer', 'items')
@@ -235,12 +235,12 @@ class PrintController extends Controller
             // Boucler sur les produits de la commande
             foreach ($order->items as $item) {
                 // Récupérer le produit associé à l'élément de commande
-                $product = OrderProduct::find($item->order_product_id);
+                $product = Product::find($item->product_id);
 
                 // Si le produit existe, ajouter ses données au tableau de données de la commande
                 if ($product) {
                     $orderData[] = [
-                        'Product ID' => $item->order_product_id,
+                        'Product ID' => $item->product_id,
                         'Product Name' => $product->name,
                         'Description' => $product->description,
                         'Quantity' => $item->qty,
@@ -256,12 +256,15 @@ class PrintController extends Controller
             // Ajouter les données de la commande au tableau de données des commandes
             $ordersData[] = [
                 'Order ID' => $order->id,
+                'Order Number' => $order->number,
                 'Customer Name' => $order->customer->name,
                 'Creation Date' => $formattedCreationDate,
                 'Delivered Date' => $formattedDeliveredDate,
                 'Order Items' => $orderData, // Tableau de données des produits de la commande
             ];
         }
+
+        // dd($ordersData);
 
         // Utilisez date() pour obtenir le nom du mois en français
         $monthName = $this->translateToFrench($month, 'month');
@@ -275,6 +278,43 @@ class PrintController extends Controller
             'ordersData' => $ordersData,
             'totalQuantity' => $totalQuantity,
         ]);
+
+        // Chemin du répertoire pour le PDF, avec un sous-dossier pour le mois et l'année
+        $pdfDirectory = 'pdf/' . $year . '/' . 'rapport-mensuel' . '/';
+        $fullPdfDirectory = storage_path('app/public/' . $pdfDirectory);
+
+        // Vérifiez si le répertoire existe, sinon, créez-le
+        if (!file_exists($fullPdfDirectory)) {
+            // 0755 est le mode par défaut pour les répertoires, il permet de créer des répertoires lisibles et accessibles en écriture pour tout le monde. True permet de créer les répertoires parents si nécessaire
+            mkdir($fullPdfDirectory, 0755, true);
+        }
+
+        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
+        $pdfFileName = $month . '-' . $year . '-' . '.pdf';
+
+        // Si le fichier existe déjà, on le supprime puis on le recrée pour éviter d'avoir des fichiers obsolètes ou pour les commandes modifiées.
+        if (file_exists($fullPdfDirectory . $pdfFileName)) {
+            unlink($fullPdfDirectory . $pdfFileName);
+        }
+
+        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
+        $pdfPath = $fullPdfDirectory . $pdfFileName;
+
+        $app_url = env('APP_URL');
+        $storage = Storage::url($pdfDirectory . $pdfFileName);
+        $url = $app_url . $storage;
+
+        // Enregistrement du PDF dans la dossier storage/app/public
+        $pdf->save($pdfPath);
+
+        $MonthTable = Month::where('month_number', $month)->where('year', $year)->first();
+
+        // Mise à jour de l'URL dans la base de données
+        if ($MonthTable->report_status == false) {
+            $MonthTable->report_status = true;
+            $MonthTable->report_created_at = Carbon::now();
+            $MonthTable->save(); // Enregistrez les modifications dans la base de données
+        }
 
         return $pdf->stream('orders_by_month.pdf');
     }
