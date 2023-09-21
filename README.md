@@ -8,6 +8,50 @@ Génération de bon de livraison et autres
 
 [Aquaphoenix](https://aquaphoenix.jsprod.fr/) Lien du projet.
 
+## Version 1.2 - 06/09/2023
+
+### Nouveautés
+
+- Introduction d'une toute nouvelle interface utilisateur, offrant une expérience améliorée et conviviale.
+- Amélioration des fonctionnalités de suivi des livraisons.
+- Intégration de nouvelles options de personnalisation pour les utilisateurs.
+- Mise à jour de la documentation pour refléter les changements de l'interface.
+- Ajout de la fonctionnalité de création de rapports mensuels.
+
+## Version 1.1.2 - 28/08/2023
+
+### Ajouts
+
+- Intégration de la fonctionnalité d'enregistrement des livraisons dans la base de données.
+- Mise en place de l'envoi automatique des notifications par e-mail pour les livraisons individuelles en utilisant Mailtrap.
+- Mise en place de l'envoi automatique des récapitulatifs hebdomadaires des livraisons par e-mail via Mailtrap.
+
+### Corrections
+
+- Préparation à la mise à jour future de l'interface utilisateur.
+
+## Version 1.1.1 - 21/08/2023
+
+### Ajouts
+
+- Filament : widget Nombre de client
+- Filament : widget Nombre de livraisons cette année
+- Filament : widget Nombre de livraisons le mois dernier
+- Filament : widget Livraisons par mois
+- Filament : widget Total kg
+
+## Version 1.1.0 - Date 24/07/2023
+
+### Modifications
+
+- Mise à jour de l'interface utilisateur avec de nouveaux éléments visuels.
+- Amélioration de la convivialité de l'interface de génération de PDF.
+- Optimisation des performances pour une navigation plus rapide.
+
+### Corrections
+
+- Correction d'un bug lié à l'affichage des dates de livraison dans certaines circonstances.
+
 ## Version 1.0.0 - Date 17/07/2023
 
 ### Ajouts
@@ -29,53 +73,3 @@ Génération de bon de livraison et autres
 
 - Correction de bugs mineurs liés à la saisie des données des clients.
 - Résolution d'un problème de mise en page sur la liste de livraison.
-
-## Version 1.1.0 - Date 24/07/2023
-
-### Ajouts
-
-- Ajout de la section "À Propos" pour partager l'histoire du développement d'Aquaphoenix.
-- Intégration d'une documentation complète pour guider les utilisateurs dans l'utilisation de l'application.
-- Lien vers les profils LinkedIn et GitHub du développeur ajouté à la page "À Propos".
-
-### Modifications
-
-- Mise à jour de l'interface utilisateur avec de nouveaux éléments visuels.
-- Amélioration de la convivialité de l'interface de génération de PDF.
-- Optimisation des performances pour une navigation plus rapide.
-
-### Corrections
-
-- Correction d'un bug lié à l'affichage des dates de livraison dans certaines circonstances.
-
-## Version 1.1.1 - 21/08/2023
-
-### Ajouts
-
-- Filament : widget Nombre de client
-- Filament : widget Nombre de livraisons cette année
-- Filament : widget Nombre de livraisons le mois dernier
-- Filament : widget Livraisons par mois
-- Filament : widget Total kg
-
-## Version 1.1.2 - 28/08/2023
-
-### Ajouts
-
-- Intégration de la fonctionnalité d'enregistrement des livraisons dans la base de données.
-- Mise en place de l'envoi automatique des notifications par e-mail pour les livraisons individuelles en utilisant Mailtrap.
-- Mise en place de l'envoi automatique des récapitulatifs hebdomadaires des livraisons par e-mail via Mailtrap.
-- Mise en place de l'envoi automatique des récapitulatifs mensuels des livraisons par e-mail via Mailtrap.
-
-### Corrections
-
-- Préparation à la mise à jour future de l'interface utilisateur.
-
-## Version 1.2 - 06/09/2023
-
-### Nouveautés
-
-- Introduction d'une toute nouvelle interface utilisateur, offrant une expérience améliorée et conviviale.
-- Amélioration des fonctionnalités de suivi des livraisons.
-- Intégration de nouvelles options de personnalisation pour les utilisateurs.
-- Mise à jour de la documentation pour refléter les changements de l'interface.
