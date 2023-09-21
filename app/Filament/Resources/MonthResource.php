@@ -57,7 +57,6 @@ class MonthResource extends Resource
     {
         $table->query(
             fn (): Builder => Month::query()
-                ->withoutGlobalScope(SoftDeletingScope::class)
                 ->where('count', '>', '0')
         );
 
@@ -67,12 +66,14 @@ class MonthResource extends Resource
                     ->label('Mois')
                     ->description(fn (Month $record): string => $record->year),
                 TextColumn::make('count')
+                    ->label('Nombre de livraisons du mois')
                     ->icon('heroicon-s-document-minus'),
                 IconColumn::make('report_status')
+                    ->label('Statut du rapport')
                     ->boolean(),
-                TextColumn::make('report_date')
-                    ->dateTime('d/M/Y')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('report_created_at')
+                    ->label('Date de création du rapport')
+                    ->dateTime('d/M/Y'),
             ])
             ->filters([
                 //
@@ -80,8 +81,6 @@ class MonthResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\Action::make('Envoyer mail')
-                        ->icon('heroicon-o-envelope'),
                     Tables\Actions\Action::make('Imprimer')
                         ->icon('heroicon-o-document-arrow-up')
                         ->url(fn (Month $record): string => route('order.month.print', [
