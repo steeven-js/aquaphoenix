@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Shop\OrderItem;
 use Illuminate\Database\Seeder;
+use App\Http\Controllers\MonthController;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,5 +22,9 @@ class DatabaseSeeder extends Seeder
             OrderSeeder::class,
             OrderItemSeeder::class,
         ]);
+
+        // Mise à jour du mois
+        $updateMonth = new MonthController;
+        $updateMonth->month();
     }
 }

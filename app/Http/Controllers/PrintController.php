@@ -6,195 +6,48 @@ use App\Models\Month;
 use App\Models\Shop\Order;
 use App\Models\Shop\Product;
 use Illuminate\Support\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PrintController extends Controller
 {
-    /**
-     * Générer le PDF de la commande
-     */
     public function printOrder($id)
     {
-        // Je récupère la commande
-        $order = Order::with('customer', 'items')->find($id);
+        $order = $this->getOrderById($id);
+        $year = $this->getYearFromOrder($order);
 
-        // Check if published_at is not empty
-        if (!empty($order->published_at)) {
-            $carbonDate = Carbon::parse($order->published_at);
-            $year = $carbonDate->format('Y');
-            // dd($year);
-        } else {
-            // Handle the case where published_at is empty
-            dd('Published date is empty.');
-        }
+        $orderData = $this->getOrderData($order);
+        $totalQuantity = $this->getTotalQuantity($orderData);
 
-        // Si la commande n'existe pas, je retourne une erreur 404
-        if (!$order) {
-            abort(404);
-        }
+        $pdf = $this->generateOrderPDF($order, $orderData, $year);
 
-        // J'initialise un tableau vide qui contiendra les données de la commande
-        $orderData = [];
-        // J'initialise une variable qui contiendra la quantité totale de produits
-        $totalQuantity = 0;
+        $pdfFileName = $this->getPDFFileName($order);
+        $pdfPath = $this->savePDFAndGetPath($pdf, $pdfFileName, $year);
+        $url = $this->getUrlForPDF($pdfFileName, $year);
 
-        // Je boucle sur les produits de la commande
-        foreach ($order->items as $item) {
-            // Je récupère le produit de la commande
-            $product = Product::find($item->product_id); // Je récupère l'id du produit
-
-            // Si le produit existe, je l'ajoute au tableau de données de la commande
-            if ($product) {
-
-                // J'ajoute les données du produit au tableau de données de la commande
-                $orderData[] = [
-                    'product_id' => $item->product_id, // Je récupère l'id du produit
-                    'Product Name' => $product->name, // Je récupère le nom du produit
-                    'Description' => $product->description, // Je récupère la description du produit
-                    'Quantity' => $item->qty, // Je récupère la quantité du produit
-                ];
-                $totalQuantity += $item->qty; // Je calcule la quantité totale de produits
-            }
-        }
-
-        // Je stocke la date de création de la commande formatée
-        $formattedCreationDate = $order->getFormattedPublishedDate();
-
-        // Je stocke la date de livraison de la commande formatée
-        $formattedDeliveredDate = $order->getFormattedDeliveredDate();
-
-        // Chemin du répertoire pour le PDF, avec un sous-dossier pour le mois et l'année
-        $pdfDirectory = 'pdf/' . $year . '/' . 'rapport-livraison' . '/';
-        $fullPdfDirectory = storage_path('app/public/' . $pdfDirectory);
-
-        // Vérifiez si le répertoire existe, sinon, créez-le
-        if (!file_exists($fullPdfDirectory)) {
-            // 0755 est le mode par défaut pour les répertoires, il permet de créer des répertoires lisibles et accessibles en écriture pour tout le monde. True permet de créer les répertoires parents si nécessaire
-            mkdir($fullPdfDirectory, 0755, true);
-        }
-
-        // Génération du PDF avec les données de la commande
-        $pdf = PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity'));
-
-        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
-        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
-
-        // Si le fichier existe déjà, on le supprime puis on le recrée pour éviter d'avoir des fichiers obsolètes ou pour les commandes modifiées.
-        if (file_exists($fullPdfDirectory . $pdfFileName)) {
-            unlink($fullPdfDirectory . $pdfFileName);
-        }
-
-        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
-        $pdfPath = $fullPdfDirectory . $pdfFileName;
-
-        $app_url = env('APP_URL');
-        $storage = Storage::url($pdfDirectory . $pdfFileName);
-        $url = $app_url . $storage;
-
-        // Enregistrement du PDF dans la dossier storage/app/public
-        $pdf->save($pdfPath);
-
-        $pdf->stream($pdfFileName);
-
-        // Mise à jour de l'URL dans la base de données
-        $order->url = $url;
-        $order->save(); // Enregistrez les modifications dans la base de données
+        $this->updateOrderURL($order, $url);
 
         return $pdf->stream($pdfFileName);
     }
 
-    /**
-     * Générer le PDF de la commande
-     */
     public function livraison($id)
     {
-        // Je récupère la commande
-        $order = Order::with('customer', 'items')->find($id);
+        $order = $this->getOrderById($id);
+        $year = $this->getYearFromOrder($order);
 
-        // Check if published_at is not empty
-        if (!empty($order->published_at)) {
-            $carbonDate = Carbon::parse($order->published_at);
-            $year = $carbonDate->format('Y');
-            // dd($year);
-        } else {
-            // Handle the case where published_at is empty
-            dd('Published date is empty.');
-        }
+        $orderData = $this->getOrderData($order);
+        $totalQuantity = $this->getTotalQuantity($orderData);
 
-        // Si la commande n'existe pas, je retourne une erreur 404
-        if (!$order) {
-            abort(404);
-        }
+        $pdf = $this->generateOrderPDF($order, $orderData, $year);
 
-        // J'initialise un tableau vide qui contiendra les données de la commande
-        $orderData = [];
-        // J'initialise une variable qui contiendra la quantité totale de produits
-        $totalQuantity = 0;
+        $pdfFileName = $this->getPDFFileName($order);
+        $pdfPath = $this->savePDFAndGetPath($pdf, $pdfFileName, $year);
+        $url = $this->getUrlForPDF($pdfFileName, $year);
 
-        // Je boucle sur les produits de la commande
-        foreach ($order->items as $item) {
-            // Je récupère le produit de la commande
-            $product = Product::find($item->product_id); // Je récupère l'id du produit
+        $storage = Storage::url('pdf/' . $year . '/' . 'rapport-livraison' . '/' . $pdfFileName);
 
-            // Si le produit existe, je l'ajoute au tableau de données de la commande
-            if ($product) {
-
-                // J'ajoute les données du produit au tableau de données de la commande
-                $orderData[] = [
-                    'product_id' => $item->product_id, // Je récupère l'id du produit
-                    'Product Name' => $product->name, // Je récupère le nom du produit
-                    'Description' => $product->description, // Je récupère la description du produit
-                    'Quantity' => $item->qty, // Je récupère la quantité du produit
-                ];
-                $totalQuantity += $item->qty; // Je calcule la quantité totale de produits
-            }
-        }
-
-        // Je stocke la date de création de la commande formatée
-        $formattedCreationDate = $order->getFormattedPublishedDate();
-
-        // Je stocke la date de livraison de la commande formatée
-        $formattedDeliveredDate = $order->getFormattedDeliveredDate();
-
-        // Chemin du répertoire pour le PDF, avec un sous-dossier pour le mois et l'année
-        $pdfDirectory = 'pdf/' . $year . '/' . 'rapport-livraison' . '/';
-        $fullPdfDirectory = storage_path('app/public/' . $pdfDirectory);
-
-        // Vérifiez si le répertoire existe, sinon, créez-le
-        if (!file_exists($fullPdfDirectory)) {
-            // 0755 est le mode par défaut pour les répertoires, il permet de créer des répertoires lisibles et accessibles en écriture pour tout le monde. True permet de créer les répertoires parents si nécessaire
-            mkdir($fullPdfDirectory, 0755, true);
-        }
-
-        // Génération du PDF avec les données de la commande
-        $pdf = PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity'));
-
-        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
-        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
-
-        // Si le fichier existe déjà, on le supprime puis on le recrée pour éviter d'avoir des fichiers obsolètes ou pour les commandes modifiées.
-        if (file_exists($fullPdfDirectory . $pdfFileName)) {
-            unlink($fullPdfDirectory . $pdfFileName);
-        }
-
-        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
-        $pdfPath = $fullPdfDirectory . $pdfFileName;
-
-        $app_url = env('APP_URL');
-        $storage = Storage::url($pdfDirectory . $pdfFileName);
-        $url = $app_url . $storage;
-        // dd($url);
-
-        // Enregistrement du PDF dans la dossier storage/app/public
-        $pdf->save($pdfPath);
-
-        $pdf->stream($pdfFileName);
-
-        // Mise à jour de l'URL dans la base de données
-        $order->url = $url;
-        $order->save(); // Enregistrez les modifications dans la base de données
+        $this->updateOrderURL($order, $url);
 
         return [
             'pdfPath' => $pdfPath,
@@ -203,42 +56,152 @@ class PrintController extends Controller
         ];
     }
 
-    /**
-     * Générer le PDF des commandes du mois.
-     *
-     * @param int $month Le mois pour lequel vous souhaitez générer le PDF.
-     * @param int $year L'année pour laquelle vous souhaitez générer le PDF.
-     * @return \Illuminate\Http\Response
-     */
     public function ordersByMonth($month, $year)
     {
-        // Récupérer les commandes du mois et de l'année spécifiés
-        $orders = Order::with('customer', 'items')
-            ->whereMonth('published_at', $month)
-            ->whereYear('published_at', $year)
-            ->get();
+        $orders = $this->getOrdersByMonthAndYear($month, $year);
 
-        // Si aucune commande n'est trouvée, retourner une erreur 404
-        if ($orders->isEmpty()) {
+        $ordersData = $this->getOrdersData($orders);
+        $totalQuantity = $this->getMonthTotalQuantity($ordersData);
+
+        $monthName = $this->translateToFrench($month, 'month');
+
+        $MonthTable = Month::where('month_number', $month)->where('year', $year)->first();
+
+        $pdf = $this->generateOrdersByMonthPDF($monthName, $year, $ordersData, $totalQuantity);
+
+        $pdfFileName = $this->getOrdersByMonthPDFFileName($month, $year);
+        $pdfPath = $this->savePDFAndGetPath($pdf, $pdfFileName, $year);
+
+        $this->updateMonthTable($month, $year);
+
+        $this->sendNotificationForMonthReport($monthName, $MonthTable, $year);
+
+        return $pdf->stream('orders_by_month.pdf');
+    }
+
+    // Helper functions
+    private function getOrderById($id)
+    {
+        $order = Order::with('customer', 'items')->find($id);
+
+        if (!$order) {
             abort(404);
         }
 
-        // Initialiser un tableau pour stocker les données des commandes
-        $ordersData = [];
-        // Initialiser une variable pour stocker la quantité totale de produits
+        return $order;
+    }
+
+    private function getYearFromOrder($order)
+    {
+        if (!empty($order->published_at)) {
+            return Carbon::parse($order->published_at)->format('Y');
+        }
+
+        dd('Published date is empty.');
+    }
+
+    private function getOrderData($order)
+    {
+        $orderData = [];
+        foreach ($order->items as $item) {
+            $product = Product::find($item->product_id);
+            if ($product) {
+                $orderData[] = [
+                    'product_id' => $item->product_id,
+                    'Product Name' => $product->name,
+                    'Description' => $product->description,
+                    'Quantity' => $item->qty,
+                ];
+            }
+        }
+
+        return $orderData;
+    }
+
+    private function getTotalQuantity($orderData)
+    {
+        $totalQuantity = 0;
+        foreach ($orderData as $item) {
+            $totalQuantity = $totalQuantity + $item['Quantity'];
+        }
+        return $totalQuantity;
+
+    }
+
+    private function getMonthTotalQuantity($orderData)
+    {
         $totalQuantity = 0;
 
-        // Boucler sur les commandes
+        foreach ($orderData as $order) {
+            foreach ($order['Order Items'] as $item) {
+                if (isset($item['Quantity'])) {
+                    $totalQuantity += $item['Quantity'];
+                }
+            }
+        }
+        return $totalQuantity;
+    }
+
+    private function generateOrderPDF($order, $orderData, $year)
+    {
+        $formattedCreationDate = $order->getFormattedPublishedDate();
+
+        $formattedDeliveredDate = $order->getFormattedDeliveredDate();
+
+        $totalQuantity = $this->getTotalQuantity($orderData);
+
+        return PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity'));
+    }
+
+    private function getPDFFileName($order)
+    {
+        return $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
+    }
+
+    private function savePDFAndGetPath($pdf, $pdfFileName, $year)
+    {
+        $pdfDirectory = 'pdf/' . $year . '/' . 'rapport-livraison' . '/';
+        $fullPdfDirectory = storage_path('app/public/' . $pdfDirectory);
+
+        if (!file_exists($fullPdfDirectory)) {
+            mkdir($fullPdfDirectory, 0755, true);
+        }
+
+        $pdfPath = $fullPdfDirectory . $pdfFileName;
+
+        $pdf->save($pdfPath);
+
+        return $pdfPath;
+    }
+
+    private function getUrlForPDF($pdfFileName, $year)
+    {
+        $app_url = env('APP_URL');
+        $storage = Storage::url('pdf/' . $year . '/' . 'rapport-livraison' . '/' . $pdfFileName);
+        return $app_url . $storage;
+    }
+
+    private function updateOrderURL($order, $url)
+    {
+        $order->url = $url;
+        $order->save();
+    }
+
+    private function getOrdersByMonthAndYear($month, $year)
+    {
+        return Order::with('customer', 'items')
+            ->whereMonth('published_at', $month)
+            ->whereYear('published_at', $year)
+            ->get();
+    }
+
+    private function getOrdersData($orders)
+    {
+        $ordersData = [];
         foreach ($orders as $order) {
-            // Initialiser un tableau pour stocker les données de chaque commande
             $orderData = [];
-
-            // Boucler sur les produits de la commande
             foreach ($order->items as $item) {
-                // Récupérer le produit associé à l'élément de commande
                 $product = Product::find($item->product_id);
-
-                // Si le produit existe, ajouter ses données au tableau de données de la commande
                 if ($product) {
                     $orderData[] = [
                         'Product ID' => $item->product_id,
@@ -246,90 +209,56 @@ class PrintController extends Controller
                         'Description' => $product->description,
                         'Quantity' => $item->qty,
                     ];
-                    $totalQuantity += $item->qty;
                 }
             }
-
-            // Stocker les dates de création et de livraison formatées
             $formattedCreationDate = $order->getFormattedPublishedDate();
             $formattedDeliveredDate = $order->getFormattedDeliveredDate();
-
-            // Ajouter les données de la commande au tableau de données des commandes
             $ordersData[] = [
                 'Order ID' => $order->id,
                 'Order Number' => $order->number,
                 'Customer Name' => $order->customer->name,
                 'Creation Date' => $formattedCreationDate,
                 'Delivered Date' => $formattedDeliveredDate,
-                'Order Items' => $orderData, // Tableau de données des produits de la commande
+                'Order Items' => $orderData,
             ];
         }
+        return $ordersData;
+    }
 
-        // dd($ordersData);
-
-        // Utilisez date() pour obtenir le nom du mois en français
-        $monthName = $this->translateToFrench($month, 'month');
-
-        // dd($ordersData, $totalQuantity, $monthName, $year);
-
-        // Générer le PDF avec les données
-        $pdf = PDF::loadView('pages.rapport.pdf.orders_by_month', [
+    private function generateOrdersByMonthPDF($monthName, $year, $ordersData, $totalQuantity)
+    {
+        return PDF::loadView('pages.rapport.pdf.orders_by_month', [
             'monthName' => $monthName,
             'year' => $year,
             'ordersData' => $ordersData,
             'totalQuantity' => $totalQuantity,
         ]);
+    }
 
-        // Chemin du répertoire pour le PDF, avec un sous-dossier pour le mois et l'année
-        $pdfDirectory = 'pdf/' . $year . '/' . 'rapport-mensuel' . '/';
-        $fullPdfDirectory = storage_path('app/public/' . $pdfDirectory);
+    private function getOrdersByMonthPDFFileName($month, $year)
+    {
+        return $month . '-' . $year . '-' . '.pdf';
+    }
 
-        // Vérifiez si le répertoire existe, sinon, créez-le
-        if (!file_exists($fullPdfDirectory)) {
-            // 0755 est le mode par défaut pour les répertoires, il permet de créer des répertoires lisibles et accessibles en écriture pour tout le monde. True permet de créer les répertoires parents si nécessaire
-            mkdir($fullPdfDirectory, 0755, true);
-        }
-
-        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
-        $pdfFileName = $month . '-' . $year . '-' . '.pdf';
-
-        // Si le fichier existe déjà, on le supprime puis on le recrée pour éviter d'avoir des fichiers obsolètes ou pour les commandes modifiées.
-        if (file_exists($fullPdfDirectory . $pdfFileName)) {
-            unlink($fullPdfDirectory . $pdfFileName);
-        }
-
-        // Enregistrement du PDF dans le dossier storage/app/public dans un sous-dossier nommé avec le mois et de l'année de la commande
-        $pdfPath = $fullPdfDirectory . $pdfFileName;
-
-        $app_url = env('APP_URL');
-        $storage = Storage::url($pdfDirectory . $pdfFileName);
-        $url = $app_url . $storage;
-
-        // Enregistrement du PDF dans la dossier storage/app/public
-        $pdf->save($pdfPath);
-
+    private function updateMonthTable($month, $year)
+    {
         $MonthTable = Month::where('month_number', $month)->where('year', $year)->first();
-
-        // Mise à jour de l'URL dans la base de données
         if ($MonthTable->report_status == false) {
             $MonthTable->report_status = true;
             $MonthTable->report_created_at = Carbon::now();
-            $MonthTable->save(); // Enregistrez les modifications dans la base de données
+            $MonthTable->save();
         }
-
-        Notification::make()
-        ->title('Nouvelle commande')
-        ->icon('heroicon-o-shopping-bag')
-        ->body("** Rapport du mois {$monthName} créé le {$MonthTable->report_created_at} **")
-        ->sendToDatabase(auth()->user());
-
-        return $pdf->stream('orders_by_month.pdf');
     }
 
-    /**
-     * Méthode pour traduire les mois ou d'autres éléments en français.
-     * ex: 1 => janvier, 2 => février, etc.
-     */
+    private function sendNotificationForMonthReport($monthName, $MonthTable, $year)
+    {
+        Notification::make()
+            ->title('Nouvelle commande')
+            ->icon('heroicon-o-shopping-bag')
+            ->body("** Rapport du mois {$monthName} créé le {$MonthTable->report_created_at} **")
+            ->sendToDatabase(auth()->user());
+    }
+
     public function translateToFrench($value, $type)
     {
         if ($type === 'month') {

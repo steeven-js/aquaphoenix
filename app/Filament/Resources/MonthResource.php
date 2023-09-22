@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Support\Enums\IconPosition;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\MonthResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -73,21 +74,22 @@ class MonthResource extends Resource
                     ->boolean(),
                 TextColumn::make('report_created_at')
                     ->label('Date de création du rapport')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime('d/M/Y'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\Action::make('Imprimer')
-                        ->icon('heroicon-o-document-arrow-up')
-                        ->url(fn (Month $record): string => route('order.month.print', [
-                            'month' => $record->month_number,
-                            'year' => $record->year,
-                        ])),
-                ]),
+                Tables\Actions\Action::make('Imprimer')
+                    ->url(fn (Month $record): string => route('order.month.print', [
+                        'month' => $record->month_number,
+                        'year' => $record->year,
+                    ]))
+                    ->button()
+                    ->color('danger')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->iconPosition(IconPosition::After),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

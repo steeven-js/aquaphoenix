@@ -285,7 +285,7 @@ class OrderSeeder extends Seeder
                 'id' => 20,
                 'customer_id' => 1,
                 'number' => 'CMD-0020',
-                'status' => 'en progression',
+                'status' => 'livré',
                 'notes' => null,
                 'published_at' => '2023-09-15',
                 'delivered_date' => '2023-09-18',
