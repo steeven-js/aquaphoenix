@@ -195,6 +195,24 @@ class OrderItemSeeder extends Seeder
                 'created_at' => '2023-09-15 15:01:41',
                 'updated_at' => '2023-09-15 15:01:41',
             ],
+            [
+                'id' => 21,
+                'sort' => 0,
+                'order_id' => 21,
+                'product_id' => 1,
+                'qty' => 46,
+                'created_at' => '2023-09-19 08:54:51',
+                'updated_at' => '2023-09-19 08:54:51',
+            ],
+            [
+                'id' => 22,
+                'sort' => 0,
+                'order_id' => 22,
+                'product_id' => 1,
+                'qty' => 32,
+                'created_at' => '2023-09-21 16:24:36',
+                'updated_at' => '2023-09-21 16:24:36',
+            ],
         ];
 
         DB::table('order_items')->insert($orderItems);

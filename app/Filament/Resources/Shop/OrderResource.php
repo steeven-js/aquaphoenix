@@ -2,23 +2,24 @@
 
 namespace App\Filament\Resources\Shop;
 
+use Filament\Forms;
+use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\Shop\Order;
+use Filament\Tables\Table;
+use Squire\Models\Currency;
+use App\Models\Shop\Product;
+use Illuminate\Support\Carbon;
+use Filament\Resources\Resource;
+use App\Forms\Components\AddressForm;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
+use Filament\Support\Enums\IconPosition;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\Shop\OrderResource\Pages;
 use App\Filament\Resources\Shop\OrderResource\RelationManagers;
 use App\Filament\Resources\Shop\OrderResource\Widgets\OrderStats;
-use App\Forms\Components\AddressForm;
-use App\Models\Shop\Order;
-use App\Models\Shop\Product;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Carbon;
-use Squire\Models\Currency;
 
 class OrderResource extends Resource
 {
@@ -140,15 +141,19 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\Action::make('Envoyer mail')
-                        ->icon('heroicon-o-envelope')
-                        ->url(fn (Order $record): string => route('livraison.mail', $record)),
-                    Tables\Actions\Action::make('Imprimer')
-                        ->icon('heroicon-o-document-arrow-up')
-                        ->url(fn (Order $record): string => route('order.print', $record)),
-                ]),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('Envoyer mail')
+                    ->url(fn (Order $record): string => route('livraison.mail', $record))
+                    ->button()
+                    ->icon('heroicon-o-envelope')
+                    ->color('primary')
+                    ->iconPosition(IconPosition::After),
+                Tables\Actions\Action::make('Imprimer')
+                    ->url(fn (Order $record): string => route('order.print', $record))
+                    ->button()
+                    ->color('danger')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->iconPosition(IconPosition::After),
             ])
             ->groupedBulkActions([
                 Tables\Actions\DeleteBulkAction::make()
@@ -232,9 +237,11 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('product_id')
                             ->label('Product')
                             ->options(Product::query()->pluck('name', 'id'))
+                            ->preload()
+                            // Par defaut, le produit est le premier de la liste
+                            ->default(Product::query()->where('id', 1)->pluck('id')->first())
                             ->required()
                             ->reactive()
-                            ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('unit_price', Product::find($state)?->price ?? 0))
                             ->columnSpan([
                                 'md' => 5,
                             ])
@@ -305,6 +312,7 @@ class OrderResource extends Resource
                     'livré' => 'livré',
                     'annulé' => 'annulé',
                 ])
+                ->default('en progression')
                 ->required()
                 ->native(false),
 
@@ -312,10 +320,5 @@ class OrderResource extends Resource
                 ->columnSpan('full'),
 
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
     }
 }

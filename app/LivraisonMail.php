@@ -22,12 +22,12 @@ class LivraisonMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($mailData, $storage, $url)
+    public function __construct($storage, $url)
     {
         $this->mailData = $mailData;
         $this->storage = $storage;
         $this->url = $url;
-        // dd($storage);
+        dd($this->mailData, $this->storage, $this->url);
     }
 
     /**

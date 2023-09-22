@@ -19,8 +19,10 @@ class CreateOrder extends CreateRecord
 
     protected function afterCreate(): void
     {
+        // Récupération de la commande
         $order = $this->record;
 
+        // Notification
         Notification::make()
             ->title('Nouvelle commande')
             ->icon('heroicon-o-shopping-bag')
@@ -31,11 +33,19 @@ class CreateOrder extends CreateRecord
             ])
             ->sendToDatabase(auth()->user());
 
+        // Mise à jour du numéro de commande
         $order->number = 'CMD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
         $order->save();
 
+        // Mise à jour du mois
         $updateMonth = new MonthController;
         $updateMonth->month();
+    }
+
+    // Redirection
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 
     protected function getSteps(): array
