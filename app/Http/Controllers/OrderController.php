@@ -19,88 +19,113 @@ use App\Notifications\ReportDeliveredNotification;
 class OrderController extends Controller
 {
 
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Envoyer le PDF de la commande par e-mail.
-     */
     public function livraisonMail(Order $order)
     {
-        // Je récupère la commande
-        $order = Order::with('customer', 'items')->find($order->id);
+        // Récupérer la commande
+        $order = $this->getOrderWithCustomerAndItems($order->id);
 
-        // Check if published_at is not empty
-        if (!empty($order->published_at)) {
-            $carbonDate = Carbon::parse($order->published_at);
-            $year = $carbonDate->format('Y');
-            // dd($year);
-        } else {
-            // Handle the case where published_at is empty
-            dd('Published date is empty.');
+        // Vérifier si published_at est vide
+        if (empty($order->published_at)) {
+            dd('La date de publication est vide.');
         }
 
-        // Si la commande n'existe pas, je retourne une erreur 404
-        if (!$order) {
-            abort(404);
-        }
-
-        // J'initialise un tableau vide qui contiendra les données de la commande
+        // Initialiser les données de la commande et la quantité totale
         $orderData = [];
-        // J'initialise une variable qui contiendra la quantité totale de produits
         $totalQuantity = 0;
 
-        // Je boucle sur les produits de la commande
+        // Parcourir les produits de la commande
         foreach ($order->items as $item) {
-            // Je récupère le produit de la commande
-            $product = Product::find($item->product_id); // Je récupère l'id du produit
+            $product = $this->getProduct($item->product_id);
 
-            // Si le produit existe, je l'ajoute au tableau de données de la commande
             if ($product) {
-
-                // J'ajoute les données du produit au tableau de données de la commande
-                $orderData[] = [
-                    'product_id' => $item->product_id, // Je récupère l'id du produit
-                    'Product Name' => $product->name, // Je récupère le nom du produit
-                    'Description' => $product->description, // Je récupère la description du produit
-                    'Quantity' => $item->qty, // Je récupère la quantité du produit
-                ];
-                $totalQuantity += $item->qty; // Je calcule la quantité totale de produits
+                $orderData[] = $this->getProductData($item, $product);
+                $totalQuantity += $item->qty;
             }
         }
 
-        // Appelez la méthode livraison du PrintController pour générer le PDF
-        $printController = new PrintController(); // Créez une instance du PrintController
-        $pdfPath = $printController->livraison($order->id); // Appelez la méthode livraison
+        // Générer le PDF
+        $pdfPath = $this->generatePDF($order->id);
 
-        // Configurez les données pour l'e-mail
-        $mailData = [
+        // Configurer les données pour l'e-mail
+        $mailData = $this->prepareMailData($order, $pdfPath, $totalQuantity);
+
+        // Envoyer l'e-mail
+        $this->sendEmail($mailData);
+
+        // Marquer la commande comme rapport envoyé avec succès
+        $this->markOrderAsReportDelivered($order);
+
+        // Envoyer la notification
+        $this->sendNotification($order);
+
+        // Rediriger avec un message de succès
+        return redirect()->route('filament.admin.pages.dashboard');
+    }
+
+    // Méthodes auxiliaires
+
+    private function getOrderWithCustomerAndItems($orderId)
+    {
+        return Order::with('customer', 'items')->find($orderId);
+    }
+
+    private function getProduct($productId)
+    {
+        return Product::find($productId);
+    }
+
+    private function getProductData($item, $product)
+    {
+        return [
+            'product_id' => $item->product_id,
+            'Product Name' => $product->name,
+            'Description' => $product->description,
+            'Quantity' => $item->qty,
+        ];
+    }
+
+    private function generatePDF($orderId)
+    {
+        $printController = new PrintController();
+        return $printController->livraison($orderId);
+    }
+
+    private function prepareMailData($order, $pdfPath, $totalQuantity)
+    {
+        return [
             'order' => $order,
             'number' => $order->number,
             'pdfPath' => $pdfPath,
-            'orderUrl' => route('order.print', $order->id), // Je récupère l'id de la commande
+            'orderUrl' => route('order.print', $order->id),
             'url' => $order->url,
             'formattedCreationDate' => $order->getFormattedPublishedDate(),
             'formattedDeliveredDate' => $order->getFormattedDeliveredDate(),
-            'totalQuantity' => $totalQuantity, // Assurez-vous que cette variable est définie correctement
+            'totalQuantity' => $totalQuantity,
         ];
+    }
 
-        $result = $printController->livraison($order->id); // Appelez la méthode du contrôleur livraison
-        $pdfPath = $result['pdfPath']; // Je récupère le chemin du PDF
-        $storage = $result['storage']; // Je récupère le chemin du stockage
-        $url = $result['url']; // Je récupère l'url du PDF
+    private function sendEmail($mailData)
+    {
+        $result = $this->generatePDF($mailData['order']->id);
+        $pdfPath = $result['pdfPath'];
+        $storage = $result['storage'];
+        $url = $result['url'];
 
         Mail::to('lianajacques18@gmail.com')
-            ->cc(['liana.jacques@aquaphoenix.fr','jacques.steeven@gmail.com'])
+            ->cc(['liana.jacques@aquaphoenix.fr', 'jacques.steeven@gmail.com'])
             ->send(new LivraisonMail($mailData, $storage, $url));
+    }
 
-        // Marquez la commande comme rapport envoyé avec succès
+
+    private function markOrderAsReportDelivered($order)
+    {
         $order->report_delivered = 1;
         $order->report_delivered_date = now();
         $order->save();
+    }
 
+    private function sendNotification($order)
+    {
         $recipient = auth()->user();
 
         Notification::make()
@@ -110,8 +135,5 @@ class OrderController extends Controller
                     ->url(OrderResource::getUrl('edit', ['record' => $order])),
             ])
             ->sendToDatabase($recipient);
-
-        // Redirigez avec un message de succès
-        return redirect()->route('filament.admin.pages.dashboard');
     }
 }
