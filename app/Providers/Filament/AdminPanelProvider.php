@@ -48,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->navigationGroups([
-                'Shop',
+                'Livraison',
                 'Rapports',
             ])
             ->databaseNotifications()

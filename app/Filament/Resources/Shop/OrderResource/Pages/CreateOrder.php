@@ -17,6 +17,8 @@ class CreateOrder extends CreateRecord
 
     protected static string $resource = OrderResource::class;
 
+    protected ?string $heading = 'Créer un bon de livraison';
+
     protected function afterCreate(): void
     {
         // Récupération de la commande
@@ -52,11 +54,13 @@ class CreateOrder extends CreateRecord
     {
         return [
             Step::make('Order Details')
+                ->label('Informations de la commande')
                 ->schema([
                     Section::make()->schema(OrderResource::getFormSchema())->columns(),
                 ]),
 
             Step::make('Order Items')
+                ->label('Articles de la commande')
                 ->schema([
                     Section::make()->schema(OrderResource::getFormSchema('items')),
                 ]),

@@ -29,9 +29,9 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static ?string $modelLabel = 'Livraison';
+    protected static ?string $modelLabel = 'Bon de livraison';
 
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Livraison';
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
@@ -73,14 +73,17 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('number')
+                    ->label('Numéro de commande')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
+                    ->label('Client')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('status')
+                ->label('Statut de la livraison')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'en progression' => 'warning',
@@ -89,7 +92,7 @@ class OrderResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Order Date')
+                    ->label('Date de création')
                     ->date()
                     ->toggleable(),
 
@@ -111,6 +114,7 @@ class OrderResource extends Resource
             ])->defaultSort('number', 'desc')
             ->filters([
                 Tables\Filters\Filter::make('created_at')
+                    ->label('Date de création')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
                             ->placeholder(fn ($state): string => 'Dec 18, ' . now()->subYear()->format('Y')),
@@ -235,7 +239,7 @@ class OrderResource extends Resource
                     ->relationship()
                     ->schema([
                         Forms\Components\Select::make('product_id')
-                            ->label('Product')
+                            ->label('Désignation')
                             ->options(Product::query()->pluck('name', 'id'))
                             ->preload()
                             // Par defaut, le produit est le premier de la liste
@@ -248,7 +252,7 @@ class OrderResource extends Resource
                             ->searchable(),
 
                         Forms\Components\TextInput::make('qty')
-                            ->label('Quantity')
+                            ->label('Poid (kg)')
                             ->numeric()
                             ->default(1)
                             ->columnSpan([
@@ -270,6 +274,7 @@ class OrderResource extends Resource
         return [
 
             Forms\Components\Select::make('customer_id')
+                ->label('Client')
                 ->relationship('customer', 'name')
                 ->searchable()
                 ->preload()
@@ -307,6 +312,7 @@ class OrderResource extends Resource
                 ->required(),
 
             Forms\Components\Select::make('status')
+                ->label('Statut de la commande')
                 ->options([
                     'en progression' => 'en progression',
                     'livré' => 'livré',
