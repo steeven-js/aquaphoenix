@@ -17,10 +17,11 @@
 
 <body>
     <div class="container mx-auto py-4">
-        <h1 class="title text-3xl font-semibold mb-4">Rapport des commandes pour {{ $monthName }} {{ $year }}</h1>
+        <h1 class="title text-3xl font-semibold mb-4">Rapport des livraisons</h1>
+        <h1 class="title text-3xl font-semibold mb-4">{{ $monthName }} {{ $year }}</h1>
 
         @if ($ordersData)
-            <p class="mb-2">Poid total des livraisons ce mois-ci : {{ $totalQuantity }} kg</p>
+            <p class="mb-2">Poid total des livraisons ({{ $monthName }} {{ $year }}) : {{ $totalQuantity }} kg</p>
 
             <table class="w-full border-collapse border border-gray-400">
                 <thead>

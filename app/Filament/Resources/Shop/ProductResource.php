@@ -43,6 +43,7 @@ class ProductResource extends Resource
                         Forms\Components\Section::make()
                             ->schema([
                                 Forms\Components\TextInput::make('name')
+                                    ->label('Désignation')
                                     ->required()
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
@@ -71,7 +72,7 @@ class ProductResource extends Resource
                         Forms\Components\Section::make('Status')
                             ->schema([
                                 Forms\Components\Toggle::make('is_visible')
-                                    ->label('Visible')
+                                    ->label('Produit visible')
                                     ->helperText('This product will be hidden from all sales channels.')
                                     ->default(true),
 
@@ -93,12 +94,12 @@ class ProductResource extends Resource
             ->columns([
 
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Name')
+                    ->label('Désignation')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_visible')
-                    ->label('Visibility')
+                    ->label('Produit visible')
                     ->boolean()
                     ->sortable()
                     ->toggleable(),

@@ -17,7 +17,6 @@ class Month extends Model
         'month',
         'start_date',
         'end_date',
-        'report_status',
     ];
 
     public function orders()

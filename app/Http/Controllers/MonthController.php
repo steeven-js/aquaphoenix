@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Redirect;
 
 class MonthController extends Controller
 {
+    /**
+     * Méthode pour mettre à jour les données de mois
+     *
+     * @return void
+     */
     public function month()
     {
         // Obtention de l'année en cours à l'aide de Carbon
@@ -36,7 +41,6 @@ class MonthController extends Controller
                 // Le mois existe déjà, mettez à jour les données
                 $month->start_date = $startOfMonth;
                 $month->end_date = $endOfMonth;
-                $month->report_status = false;
                 $month->count = $count;
                 $month->save();
             } else {
@@ -47,7 +51,6 @@ class MonthController extends Controller
                 $month->month_number = $i;
                 $month->start_date = $startOfMonth;
                 $month->end_date = $endOfMonth;
-                $month->report_status = false;
                 $month->count = $count;
                 $month->save();
             }
@@ -66,7 +69,13 @@ class MonthController extends Controller
         return Redirect::route('filament.admin.pages.dashboard');
     }
 
-    // Méthode pour obtenir le nombre d'orders pour un mois donné
+    /**
+     * Méthode pour obtenir le nombre d'orders pour le mois et l'année spécifiés
+     *
+     * @param [type] $year
+     * @param [type] $month
+     * @return void
+     */
     public function count($year, $month)
     {
         // Obtention du nombre d'orders pour le mois et l'année spécifiés
@@ -75,7 +84,11 @@ class MonthController extends Controller
         return $count;
     }
 
-    // Pour chaque order, remplir la table pivot orders_by_month
+    /**
+     * Méthode pour remplir la table orders_by_month
+     *
+     * @return void
+     */
     public function fillOrdersByMonth()
     {
         // Obtention de l'année en cours à l'aide de Carbon

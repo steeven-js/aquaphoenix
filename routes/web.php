@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/email/livraison-mail/{order}', [OrderController::class, 'livraisonMail'])->name('livraison.mail');
 
     Route::get('/test/month', [MonthController::class, 'month'])->name('month.test');
+    Route::get('/test/updateOrderStatus', [OrderController::class, 'updateOrderStatus'])->name('order.satus.test');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -116,7 +116,6 @@ class OrderController extends Controller
             ->send(new LivraisonMail($mailData, $storage, $url));
     }
 
-
     private function markOrderAsReportDelivered($order)
     {
         $order->report_delivered = 1;
@@ -131,9 +130,44 @@ class OrderController extends Controller
         Notification::make()
             ->title('Mail envoyé avec succès le'.' '. $order->report_delivered_date)
             ->actions([
-                Action::make('View')
+                Action::make('Voir')
                     ->url(OrderResource::getUrl('edit', ['record' => $order])),
             ])
             ->sendToDatabase($recipient);
+    }
+
+    public function updateOrderStatus()
+    {
+        // Récupérer les commandes
+        $orders = Order::all();
+
+        // Parcourir les commandes
+        foreach ($orders as $order) {
+            $originalStatus = $order->status; // Sauvegarde du statut d'origine
+
+            // Vérifiez si la delivered_date est inférieure ou égale à la date actuelle (en ne tenant compte que de la date)
+            if ($order->delivered_date <= Carbon::now()->toDateString()) {
+                // Mise à jour du statut de la commande
+                $order->status = 'livré';
+                $order->save();
+
+                // Vérifiez si le statut a été modifié
+                if ($order->status !== $originalStatus) {
+                    // Envoyer la notification seulement si le statut a été modifié
+                    $recipient = auth()->user();
+
+                    Notification::make()
+                        ->title('La commande ' . $order->number . ' est livrée')
+                        ->actions([
+                            Action::make('Voir')
+                                ->url(OrderResource::getUrl('edit', ['record' => $order])),
+                        ])
+                        ->sendToDatabase($recipient);
+                }
+            }
+        }
+
+        // Redirection
+        return redirect()->route('filament.admin.resources.shop.orders.index');
     }
 }

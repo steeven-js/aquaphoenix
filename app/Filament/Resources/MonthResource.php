@@ -25,7 +25,7 @@ class MonthResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'month';
 
-    protected static ?string $modelLabel = 'Mois';
+    protected static ?string $modelLabel = 'Mensuel';
 
     protected static ?string $navigationGroup = 'Rapports';
 
@@ -47,10 +47,6 @@ class MonthResource extends Resource
                     ->disabled(),
                 TextInput::make('count')
                     ->disabled(),
-                TextInput::make('report_status')
-                    ->disabled(),
-                TextInput::make('report_date')
-                    ->disabled(),
             ]);
     }
 
@@ -69,13 +65,6 @@ class MonthResource extends Resource
                 TextColumn::make('count')
                     ->label('Nombre de livraisons du mois')
                     ->icon('heroicon-s-document-minus'),
-                IconColumn::make('report_status')
-                    ->label('Statut du rapport')
-                    ->boolean(),
-                TextColumn::make('report_created_at')
-                    ->label('Date de création du rapport')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->dateTime('d/M/Y'),
             ])
             ->filters([
                 //

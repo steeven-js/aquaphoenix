@@ -55,11 +55,11 @@ class OrderResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Placeholder::make('created_at')
-                            ->label('Created at')
+                            ->label('Crée le')
                             ->content(fn (Order $record): ?string => $record->created_at?->diffForHumans()),
 
                         Forms\Components\Placeholder::make('updated_at')
-                            ->label('Last modified at')
+                            ->label('Dernière mise à jour')
                             ->content(fn (Order $record): ?string => $record->updated_at?->diffForHumans()),
                     ])
                     ->columnSpan(['lg' => 1])
@@ -83,7 +83,7 @@ class OrderResource extends Resource
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('status')
-                ->label('Statut de la livraison')
+                    ->label('Statut de la livraison')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'en progression' => 'warning',
@@ -91,9 +91,14 @@ class OrderResource extends Resource
                         'annulé' => 'danger',
                     }),
 
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('published_at')
                     ->label('Date de création')
-                    ->date()
+                    ->date('d/M/Y')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('delivered_date')
+                    ->label('Date de livraison')
+                    ->date('d/M/Y')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('url')
@@ -117,8 +122,10 @@ class OrderResource extends Resource
                     ->label('Date de création')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
+                            ->label('Créé depuis')
                             ->placeholder(fn ($state): string => 'Dec 18, ' . now()->subYear()->format('Y')),
                         Forms\Components\DatePicker::make('created_until')
+                            ->label('Créé jusqu\'au')
                             ->placeholder(fn ($state): string => now()->format('M d, Y')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -143,6 +150,14 @@ class OrderResource extends Resource
 
                         return $indicators;
                     }),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('Actualiser')
+                ->url(route('order.satus.test'))
+                ->button()
+                ->color('primary')
+                ->icon('heroicon-o-document-arrow-up')
+                ->iconPosition(IconPosition::After),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

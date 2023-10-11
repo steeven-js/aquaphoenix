@@ -72,8 +72,6 @@ class PrintController extends Controller
         $pdfFileName = $this->getOrdersByMonthPDFFileName($month, $year);
         $pdfPath = $this->savePDFAndGetPath($pdf, $pdfFileName, $year);
 
-        $this->updateMonthTable($month, $year);
-
         $this->sendNotificationForMonthReport($monthName, $MonthTable, $year);
 
         return $pdf->stream('orders_by_month.pdf');
@@ -240,16 +238,6 @@ class PrintController extends Controller
         return $month . '-' . $year . '-' . '.pdf';
     }
 
-    private function updateMonthTable($month, $year)
-    {
-        $MonthTable = Month::where('month_number', $month)->where('year', $year)->first();
-        if ($MonthTable->report_status == false) {
-            $MonthTable->report_status = true;
-            $MonthTable->report_created_at = Carbon::now();
-            $MonthTable->save();
-        }
-    }
-
     private function sendNotificationForMonthReport($monthName, $MonthTable, $year)
     {
         Notification::make()
@@ -263,18 +251,18 @@ class PrintController extends Controller
     {
         if ($type === 'month') {
             $months = [
-                1 => 'janvier',
-                2 => 'février',
-                3 => 'mars',
-                4 => 'avril',
-                5 => 'mai',
-                6 => 'juin',
-                7 => 'juillet',
-                8 => 'août',
-                9 => 'septembre',
-                10 => 'octobre',
-                11 => 'novembre',
-                12 => 'décembre',
+                1 => 'Janvier',
+                2 => 'Février',
+                3 => 'Mars',
+                4 => 'Avril',
+                5 => 'Mai',
+                6 => 'Juin',
+                7 => 'Juillet',
+                8 => 'Août',
+                9 => 'Septembre',
+                10 => 'Octobre',
+                11 => 'Novembre',
+                12 => 'Décembre',
             ];
 
             return $months[$value] ?? '';
