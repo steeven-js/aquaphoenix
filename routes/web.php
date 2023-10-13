@@ -28,9 +28,9 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::get('/print/order/{id}', [PrintController::class, 'printOrder'])->name('order.print');
+    Route::get('/print/order/print/{order}', [PrintController::class, 'openPdf'])->name('livraison.print');
+    Route::get('/print/order/mail/{order}', [PrintController::class, 'mailLivraison'])->name('livraison.mail');
     Route::get('/print/month/{month}/{year}', [PrintController::class, 'ordersByMonth'])->name('order.month.print');
-    Route::get('/email/livraison-mail/{order}', [OrderController::class, 'livraisonMail'])->name('livraison.mail');
 
     Route::get('/test/month', [MonthController::class, 'month'])->name('month.test');
     Route::get('/test/updateOrderStatus', [OrderController::class, 'updateOrderStatus'])->name('order.satus.test');

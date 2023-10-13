@@ -153,26 +153,26 @@ class OrderResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('Actualiser')
-                ->url(route('order.satus.test'))
-                ->button()
-                ->color('primary')
-                ->icon('heroicon-o-document-arrow-up')
-                ->iconPosition(IconPosition::After),
+                    ->url(route('order.satus.test'))
+                    ->button()
+                    ->color('primary')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->iconPosition(IconPosition::After),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('Envoyer mail')
-                    ->url(fn (Order $record): string => route('livraison.mail', $record))
-                    ->button()
-                    ->icon('heroicon-o-envelope')
-                    ->color('primary')
-                    ->iconPosition(IconPosition::After),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('Imprimer')
-                    ->url(fn (Order $record): string => route('order.print', $record))
+                    ->url(fn (Order $record): string => route('livraison.print', $record))
                     ->button()
                     ->color('danger')
                     ->icon('heroicon-o-document-arrow-up')
-                    ->iconPosition(IconPosition::After),
+                    ->iconPosition(IconPosition::Before),
+                Tables\Actions\Action::make('Envoyer mail')
+                    ->url(fn (Order $record): string => route('livraison.mail', $record))
+                    ->button()
+                    ->color('primary')
+                    ->icon('heroicon-o-envelope')
+                    ->iconPosition(IconPosition::Before),
             ])
             ->groupedBulkActions([
                 Tables\Actions\DeleteBulkAction::make()
