@@ -252,7 +252,7 @@ class PrintController extends Controller
         ]);
 
         $pdfFileName = $month . '-' . $year . '.pdf';
-        $pdfDirectory = "pdf/{$year}/rapport-livraison/";
+        $pdfDirectory = "pdf/{$year}/rapport-mensuel/";
         $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
 
         if (!file_exists($fullPdfDirectory)) {
