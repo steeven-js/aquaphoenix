@@ -187,6 +187,13 @@ class PrintController extends Controller
             ->sendToDatabase($recipient);
     }
 
+    /**
+     * Générer le rapport de livraison par mois et l'ouvrire dans le navigateur
+     *
+     * @param [type] $month
+     * @param [type] $year
+     * @return void
+     */
     public function ordersByMonth($month, $year)
     {
         $orders = Order::with('customer', 'items')
