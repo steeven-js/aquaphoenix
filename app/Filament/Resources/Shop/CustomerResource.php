@@ -38,6 +38,7 @@ class CustomerResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('name')
+                            ->label('Nom')
                             ->maxValue(50)
                             ->required(),
 
@@ -50,10 +51,12 @@ class CustomerResource extends Resource
                         Forms\Components\FileUpload::make('photo'),
 
                         Forms\Components\TextInput::make('phone1')
+                            ->label('Telephone 1')
                             ->tel()
                             ->maxLength(50),
 
                         Forms\Components\TextInput::make('phone2')
+                            ->label('Telephone 2')
                             ->tel()
                             ->maxLength(50),
 
@@ -69,11 +72,11 @@ class CustomerResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Placeholder::make('created_at')
-                            ->label('Created at')
+                            ->label('Créé le')
                             ->content(fn (Customer $record): ?string => $record->created_at?->diffForHumans()),
 
                         Forms\Components\Placeholder::make('updated_at')
-                            ->label('Last modified at')
+                            ->label('Modifié le')
                             ->content(fn (Customer $record): ?string => $record->updated_at?->diffForHumans()),
                     ])
                     ->columnSpan(['lg' => 1])
@@ -87,6 +90,7 @@ class CustomerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
@@ -94,9 +98,11 @@ class CustomerResource extends Resource
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone1')
+                    ->label('Téléphone 1')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone2')
+                    ->label('Téléphone 2')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('code')
@@ -104,10 +110,12 @@ class CustomerResource extends Resource
                 Tables\Columns\TextColumn::make('commune')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Créé le')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Modifié le')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
