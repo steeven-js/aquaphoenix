@@ -14,7 +14,7 @@ Génération de bon de livraison et autres
 
 - **Laravel**: Framework PHP moderne et puissant.
 - **Filament**: Interface d'administration élégante pour Laravel.
-- **Breeze**: Kit de démarrage pour Laravel qui facilite le développement.
+- **Breeze**: Authetification.
 - **domPDF**: Bibliothèque pour la génération de fichiers PDF depuis des vues HTML.
 - **SQL**: Langage de requête pour la gestion des bases de données relationnelles.
 
