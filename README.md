@@ -6,70 +6,46 @@ Génération de bon de livraison et autres
 
 ![Aquaphoenix - Light Mode](https://firebasestorage.googleapis.com/v0/b/dashboard-f3222.appspot.com/o/Tableau%20de%20bord%20-%20Aquaphoenix2.png?alt=media&token=c0af385f-1ac2-4eb0-9f34-266d9c140841)
 
+## **Projet Aquaphoenix**
+
 [Aquaphoenix](https://aquaphoenix.jsprod.fr/) Lien du projet.
 
-## Version 1.2 - 06/09/2023
+### Technologies Utilisées
 
-### Nouveautés
+- **Laravel**: Framework PHP moderne et puissant.
+- **Filament**: Interface d'administration élégante pour Laravel.
+- **Breeze**: Kit de démarrage pour Laravel qui facilite le développement.
+- **domPDF**: Bibliothèque pour la génération de fichiers PDF depuis des vues HTML.
+- **SQL**: Langage de requête pour la gestion des bases de données relationnelles.
 
-- Introduction d'une toute nouvelle interface utilisateur, offrant une expérience améliorée et conviviale.
-- Amélioration des fonctionnalités de suivi des livraisons.
-- Intégration de nouvelles options de personnalisation pour les utilisateurs.
-- Mise à jour de la documentation pour refléter les changements de l'interface.
-- Ajout de la fonctionnalité de création de rapports mensuels.
+### Fonctionnalités Principales
 
-## Version 1.1.2 - 28/08/2023
+1. **Espace Admin avec FilamentPHP**
 
-### Ajouts
+   - Utilisation de FilamentPHP pour une interface d'administration intuitive.
 
-- Intégration de la fonctionnalité d'enregistrement des livraisons dans la base de données.
-- Mise en place de l'envoi automatique des notifications par e-mail pour les livraisons individuelles en utilisant Mailtrap.
-- Mise en place de l'envoi automatique des récapitulatifs hebdomadaires des livraisons par e-mail via Mailtrap.
+2. **Génération et Sauvegarde de Bon de Livraison en PDF**
 
-### Corrections
+   - Utilisation de domPDF pour générer des bons de livraison au format PDF.
 
-- Préparation à la mise à jour future de l'interface utilisateur.
+3. **Rapport Mensuel**
 
-## Version 1.1.1 - 21/08/2023
+   - Tableau de bord affichant les livraisons du mois précédent, du mois en cours, et le poids total du mois en cours.
 
-### Ajouts
+4. **Tableau de Bords**
 
-- Filament : widget Nombre de client
-- Filament : widget Nombre de livraisons cette année
-- Filament : widget Nombre de livraisons le mois dernier
-- Filament : widget Livraisons par mois
-- Filament : widget Total kg
+   - Création d'un tableau de bord comprenant des statistiques clés.
+   - Affichage du nombre de livraisons du mois précédent, du mois en cours, et du poids total en kg pour le mois en cours.
 
-## Version 1.1.0 - Date 24/07/2023
+5. **Graphiques Statistiques**
 
-### Modifications
+   - Graphique illustrant les livraisons par mois.
+   - Graphique représentant le total des poids (en kg) par mois.
 
-- Mise à jour de l'interface utilisateur avec de nouveaux éléments visuels.
-- Amélioration de la convivialité de l'interface de génération de PDF.
-- Optimisation des performances pour une navigation plus rapide.
+6. **Gestion des Données**
 
-### Corrections
+   - Création, modification et suppression de désignations, clients et livraisons.
 
-- Correction d'un bug lié à l'affichage des dates de livraison dans certaines circonstances.
+7. **Rapport des Livraisons par Mois**
 
-## Version 1.0.0 - Date 17/07/2023
-
-### Ajouts
-
-- Création initiale de l'application Aquaphoenix.
-- Mise en place du tableau de bord personnalisé pour la gestion des bons de livraison et des produits.
-- Intégration de la génération automatisée de bons de livraison.
-- Ajout de la fonctionnalité de gestion des clients.
-- Intégration de la génération de PDF pour les bons de livraison.
-- Mise en place de la liste de livraison dédiée.
-
-### Modifications
-
-- Refonte de l'interface utilisateur pour une expérience conviviale.
-- Amélioration des performances pour une utilisation fluide.
-- Optimisation de la génération de PDF pour une meilleure qualité d'impression.
-
-### Corrections
-
-- Correction de bugs mineurs liés à la saisie des données des clients.
-- Résolution d'un problème de mise en page sur la liste de livraison.
+   - Génération automatisée d'un rapport détaillé des livraisons par mois.
