@@ -28,30 +28,23 @@ class PrintController extends Controller
 
         $year = Carbon::parse($order->published_at)->format('Y');
 
-        $orderData = [];
+        $orderData = $this->generateOrderData($order);
 
-        foreach ($order->items as $item) {
-            $product = Product::find($item->product_id);
-            if ($product) {
-                $orderData[] = [
-                    'product_id' => $item->product_id,
-                    'Product Name' => $product->name,
-                    'Description' => $product->description,
-                    'Quantity' => $item->qty,
-                ];
-            }
-        }
-
-        $totalQuantity = 0;
-
-        foreach ($orderData as $item) {
-            $totalQuantity += $item['Quantity'];
-        }
+        $totalQuantity = collect($orderData)->pluck('Quantity')->sum();
 
         $formattedCreationDate = $order->getFormattedPublishedDate();
         $formattedDeliveredDate = $order->getFormattedDeliveredDate();
 
-        $pdf = PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity'));
+        $pdfData = [
+            'order' => $order,
+            'orderData' => $orderData,
+            'formattedCreationDate' => $formattedCreationDate,
+            'formattedDeliveredDate' => $formattedDeliveredDate,
+            'totalQuantity' => $totalQuantity,
+        ];
+
+        $pdf = $this->generatePdfFromView('pages.rapport.pdf.livraison', $pdfData, $order);
+
         $pdfDirectory = "pdf/{$year}/rapport-livraison/";
         $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
         $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
@@ -62,6 +55,7 @@ class PrintController extends Controller
 
         $pdfPath = $fullPdfDirectory . $pdfFileName;
         $pdf->save($pdfPath);
+
         $storage = Storage::url("pdf/{$year}/rapport-livraison/{$pdfFileName}");
         $url = env('APP_URL') . $storage;
 
@@ -84,12 +78,10 @@ class PrintController extends Controller
      */
     public function openPdf(Order $order)
     {
-        // Generate the PDF
         $pdfData = $this->generatePdf($order);
         $pdf = $pdfData['pdf'];
         $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
 
-        // Return the PDF to be streamed
         return $pdf->stream($pdfFileName);
     }
 
@@ -101,7 +93,6 @@ class PrintController extends Controller
      */
     public function mailLivraison(Order $order)
     {
-
         // Vérifiez si $order est null et renvoyez une erreur 404 en conséquence.
         if (!$order) {
             abort(404);
@@ -126,23 +117,8 @@ class PrintController extends Controller
         }
 
         // Déclarez $orderData et $totalQuantity en dehors de la boucle foreach.
-        $orderData = [];
-        $totalQuantity = 0;
-
-        foreach ($order->items as $item) {
-            $product = Product::find($item->product_id);
-
-            if ($product) {
-                $orderData[] = [
-                    'product_id' => $item->product_id,
-                    'Nom du produit' => $product->name,
-                    'Description' => $product->description,
-                    'Quantité' => $item->qty,
-                ];
-
-                $totalQuantity += $item->qty;
-            }
-        }
+        $orderData = $this->generateOrderData($order);
+        $totalQuantity = collect($orderData)->pluck('Quantity')->sum();
 
         $mailData = [
             'order' => $order,
@@ -206,19 +182,7 @@ class PrintController extends Controller
         $ordersData = [];
 
         foreach ($orders as $order) {
-            $orderData = [];
-
-            foreach ($order->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $orderData[] = [
-                        'Product ID' => $item->product_id,
-                        'Product Name' => $product->name,
-                        'Description' => $product->description,
-                        'Quantity' => $item->qty,
-                    ];
-                }
-            }
+            $orderData = $this->generateOrderData($order);
 
             $formattedCreationDate = $order->getFormattedPublishedDate();
             $formattedDeliveredDate = $order->getFormattedDeliveredDate();
@@ -233,36 +197,22 @@ class PrintController extends Controller
             ];
         }
 
-        $totalQuantity = 0;
-
-        foreach ($ordersData as $order) {
-            foreach ($order['Order Items'] as $item) {
-                if (isset($item['Quantity'])) {
-                    $totalQuantity += $item['Quantity'];
-                }
-            }
-        }
+        $totalQuantity = collect($ordersData)->pluck('Order Items.*.Quantity')->flatten()->sum();
 
         $monthName = $this->translateToFrench($month, 'month');
         $MonthTable = Month::where('month_number', $month)->where('year', $year)->first();
 
-        $pdf = PDF::loadView('pages.rapport.pdf.orders_by_month', [
+        $pdfData = [
             'monthName' => $monthName,
             'year' => $year,
             'ordersData' => $ordersData,
             'totalQuantity' => $totalQuantity,
-        ]);
+        ];
 
         $pdfFileName = $month . '-' . $year . '.pdf';
         $pdfDirectory = "pdf/{$year}/rapport-mensuel/";
-        $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
 
-        if (!file_exists($fullPdfDirectory)) {
-            mkdir($fullPdfDirectory, 0755, true);
-        }
-
-        $pdfPath = $fullPdfDirectory . $pdfFileName;
-        $pdf->save($pdfPath);
+        $pdf = $this->generatePdfFromView('pages.rapport.pdf.orders_by_month', $pdfData, $order);
 
         return $pdf->stream($pdfFileName);
     }
@@ -301,5 +251,54 @@ class PrintController extends Controller
         }
 
         return ''; // Si le type n'est pas pris en charge, retourne une chaîne vide
+    }
+
+    private function generateOrderData(Order $order)
+    {
+        $orderData = [];
+
+        foreach ($order->items as $item) {
+            $product = $this->getProduct($item->product_id);
+
+            if ($product) {
+                $orderData[] = [
+                    'Product ID' => $item->product_id,
+                    'Product Name' => $product->name,
+                    'Description' => $product->description,
+                    'Quantity' => $item->qty,
+                ];
+            }
+        }
+
+        return $orderData;
+    }
+
+    private function getProduct($productId)
+    {
+        static $products;
+
+        if (!$products) {
+            $products = Product::whereIn('id', [$productId])->get()->keyBy('id');
+        }
+
+        return $products->get($productId);
+    }
+
+    private function generatePdfFromView($view, $data, $order)
+    {
+        $pdf = PDF::loadView($view, $data);
+        $year = Carbon::parse($order->published_at)->format('Y');
+        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
+        $pdfDirectory = "pdf/{$year}/rapport-livraison/";
+        $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
+
+        if (!file_exists($fullPdfDirectory)) {
+            mkdir($fullPdfDirectory, 0755, true);
+        }
+
+        $pdfPath = $fullPdfDirectory . $pdfFileName;
+        $pdf->save($pdfPath);
+
+        return $pdf;
     }
 }
