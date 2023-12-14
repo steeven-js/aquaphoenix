@@ -107,6 +107,19 @@ class PrintController extends Controller
             abort(404);
         }
 
+        // Générer le rapport de livraison dans le dossier storage/app/public/pdf
+        $pdfData = $this->generatePdf($order);
+
+        $year = Carbon::parse($order->published_at)->format('Y');
+        $pdfDirectory = "pdf/{$year}/rapport-livraison/";
+        $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
+
+        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
+        $storage = Storage::url("pdf/{$year}/rapport-livraison/{$pdfFileName}");
+
+        $pdfPath = $fullPdfDirectory . $pdfFileName;
+        $url = env('APP_URL') . $storage;
+
         // Vérifiez si la date de publication est vide et affichez un message de débogage si c'est le cas.
         if (empty($order->published_at)) {
             dd('La date de publication est vide.');
@@ -131,17 +144,6 @@ class PrintController extends Controller
             }
         }
 
-        $year = Carbon::parse($order->published_at)->format('Y');
-
-        $pdfDirectory = "pdf/{$year}/rapport-livraison/";
-        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
-        $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
-
-        $pdfPath = $fullPdfDirectory . $pdfFileName;
-
-        $storage = Storage::url("pdf/{$year}/rapport-livraison/{$pdfFileName}");
-        $url = env('APP_URL') . $storage;
-
         $mailData = [
             'order' => $order,
             'number' => $order->number,
@@ -155,8 +157,8 @@ class PrintController extends Controller
 
         // dd($mailData, $storage, $url);
 
-        Mail::to('lianajacques18@gmail.com')
-            ->cc(['liana.jacques@aquaphoenix.fr', 'jacques.steeven@gmail.com'])
+        Mail::to('kisama972@gmail')
+            ->cc(['jacques.steeven@gmail.com'])
             ->send(new LivraisonMail($mailData, $storage, $url));
 
         $this->sendNotification($order);
