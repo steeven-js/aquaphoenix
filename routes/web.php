@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MonthController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Redirect;
 
@@ -28,9 +27,9 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::get('/print/order/print/{order}', [PrintController::class, 'openPdf'])->name('livraison.print');
-    Route::get('/print/order/mail/{order}', [PrintController::class, 'mailLivraison'])->name('livraison.mail');
-    Route::get('/print/month/{month}/{year}', [PrintController::class, 'ordersByMonth'])->name('order.month.print');
+    Route::get('/print/order/print/{order}', [OrderController::class, 'openPdf'])->name('livraison.print');
+    Route::get('/print/order/mail/{order}', [OrderController::class, 'mailLivraison'])->name('livraison.mail');
+    Route::get('/print/month/{month}/{year}', [OrderController::class, 'ordersByMonth'])->name('order.month.print');
 
     Route::get('/test/month', [MonthController::class, 'month'])->name('month.test');
     Route::get('/test/updateOrderStatus', [OrderController::class, 'updateOrderStatus'])->name('order.satus.test');
