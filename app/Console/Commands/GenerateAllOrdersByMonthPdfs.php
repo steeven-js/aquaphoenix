@@ -30,7 +30,7 @@ class GenerateAllOrdersByMonthPdfs extends Command
         $months = Month::where('count', '>', 0)->get();
 
         foreach ($months as $month) {
-            $this->info('Generating PDF for month ' . $month->id);
+            $this->info('Generating PDF for month ' . $month->id .'/'. $month->year);
             // Appeler la méthode generatePdf du contrôleur
             app('App\Http\Controllers\OrderController')->generateAllOrdersByMonthPdfs($month);
         }
