@@ -58,7 +58,7 @@ class PrintController extends Controller
 
         // Définir le répertoire de sauvegarde du PDF
         $pdfDirectory = "pdf/{$year}/rapport-livraison/";
-        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
+        $pdfFileName = $order->id . '-' . Carbon::parse($order->published_at)->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
         $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
 
         // Créer le répertoire s'il n'existe pas
@@ -100,7 +100,7 @@ class PrintController extends Controller
         // Générer le PDF
         $pdfData = $this->generatePdf($order);
         $pdf = $pdfData['pdf'];
-        $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
+        $pdfFileName = $order->id . '-' . Carbon::parse($order->published_at)->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
 
         // Retourner le PDF à diffuser en streaming
         return $pdf->stream($pdfFileName);
