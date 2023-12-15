@@ -15,11 +15,24 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = new User;
-        $user->name = 'Admin Test';
-        $user->email = 'admin@test.com';
-        $user->password = Hash::make('85245600');
-        $user->timestamps = true;
-        $user->save();
+        $names = ['Admin Test', 'User Test', 'Liana Jacques', 'Steeven Jacques'];
+        $emails = ['admin@test.com', 'user@test.com', 'liana.jacques@aquaphoenix.fr', 'jacques.steeven@gmail.com'];
+        $commonPassword = '85245600';
+
+        $count = count($names);
+
+        for ($i = 0; $i < $count; $i++) {
+            // Vérifiez si l'email existe déjà dans la base de données
+            $existingUser = User::where('email', $emails[$i])->first();
+
+            // Si l'utilisateur n'existe pas, créez une nouvelle entrée
+            if (!$existingUser) {
+                $user = new User();
+                $user->name = $names[$i];
+                $user->email = $emails[$i];
+                $user->password = Hash::make($commonPassword);
+                $user->save();
+            }
+        }
     }
 }
