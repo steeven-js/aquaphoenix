@@ -20,16 +20,20 @@ class PrintController extends Controller
      * Générer le rapport de livraison et le sauvegarder dans le dossier storage/app/public/pdf
      *
      * @param Order $order
-     * @return void
+     * @return array
      */
     public function generatePdf(Order $order)
     {
+        // Récupérer les détails de la commande avec le client et les articles associés
         $order = Order::with('customer', 'items')->findOrFail($order->id);
 
+        // Extraire l'année de la date de publication de la commande
         $year = Carbon::parse($order->published_at)->format('Y');
 
+        // Initialiser un tableau pour stocker les données de la commande
         $orderData = [];
 
+        // Boucler à travers les articles de la commande pour obtenir les détails du produit
         foreach ($order->items as $item) {
             $product = Product::find($item->product_id);
             if ($product) {
@@ -42,32 +46,41 @@ class PrintController extends Controller
             }
         }
 
-        $totalQuantity = 0;
+        // Calculer la quantité totale commandée
+        $totalQuantity = array_sum(array_column($orderData, 'Quantity'));
 
-        foreach ($orderData as $item) {
-            $totalQuantity += $item['Quantity'];
-        }
-
+        // Formater les dates de création et de livraison de la commande
         $formattedCreationDate = $order->getFormattedPublishedDate();
         $formattedDeliveredDate = $order->getFormattedDeliveredDate();
 
+        // Charger la vue PDF avec les données de la commande
         $pdf = PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity'));
+
+        // Définir le répertoire de sauvegarde du PDF
         $pdfDirectory = "pdf/{$year}/rapport-livraison/";
         $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
         $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
 
+        // Créer le répertoire s'il n'existe pas
         if (!file_exists($fullPdfDirectory)) {
             mkdir($fullPdfDirectory, 0755, true);
         }
 
+        // Définir le chemin complet du fichier PDF
         $pdfPath = $fullPdfDirectory . $pdfFileName;
+
+        // Sauvegarder le PDF
         $pdf->save($pdfPath);
+
+        // Générer l'URL pour le PDF sauvegardé
         $storage = Storage::url("pdf/{$year}/rapport-livraison/{$pdfFileName}");
         $url = env('APP_URL') . $storage;
 
+        // Mettre à jour l'URL de la commande dans la base de données
         $order->url = $url;
         $order->save();
 
+        // Retourner les informations du PDF généré
         return [
             'pdf' => $pdf,
             'pdfPath' => $pdfPath,
@@ -84,12 +97,12 @@ class PrintController extends Controller
      */
     public function openPdf(Order $order)
     {
-        // Generate the PDF
+        // Générer le PDF
         $pdfData = $this->generatePdf($order);
         $pdf = $pdfData['pdf'];
         $pdfFileName = $order->id . '-' . $order->created_at->format('d-m-Y') . '-' . $order->customer->id . '.pdf';
 
-        // Return the PDF to be streamed
+        // Retourner le PDF à diffuser en streaming
         return $pdf->stream($pdfFileName);
     }
 
@@ -101,8 +114,7 @@ class PrintController extends Controller
      */
     public function mailLivraison(Order $order)
     {
-
-        // Vérifiez si $order est null et renvoyez une erreur 404 en conséquence.
+        // Vérifier si $order est null et renvoyer une erreur 404 en conséquence.
         if (!$order) {
             abort(404);
         }
@@ -110,6 +122,7 @@ class PrintController extends Controller
         // Générer le rapport de livraison dans le dossier storage/app/public/pdf
         $pdfData = $this->generatePdf($order);
 
+        // Extraire l'année de la date de publication de la commande
         $year = Carbon::parse($order->published_at)->format('Y');
         $pdfDirectory = "pdf/{$year}/rapport-livraison/";
         $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
@@ -120,12 +133,12 @@ class PrintController extends Controller
         $pdfPath = $fullPdfDirectory . $pdfFileName;
         $url = env('APP_URL') . $storage;
 
-        // Vérifiez si la date de publication est vide et affichez un message de débogage si c'est le cas.
+        // Vérifier si la date de publication est vide et afficher un message de débogage si c'est le cas.
         if (empty($order->published_at)) {
             dd('La date de publication est vide.');
         }
 
-        // Déclarez $orderData et $totalQuantity en dehors de la boucle foreach.
+        // Déclarer $orderData et $totalQuantity en dehors de la boucle foreach.
         $orderData = [];
         $totalQuantity = 0;
 
@@ -144,6 +157,7 @@ class PrintController extends Controller
             }
         }
 
+        // Préparer les données pour le courrier électronique
         $mailData = [
             'order' => $order,
             'number' => $order->number,
@@ -155,18 +169,20 @@ class PrintController extends Controller
             'totalQuantity' => $totalQuantity,
         ];
 
-        // dd($mailData, $storage, $url);
-
+        // Envoyer le courrier électronique avec le rapport de livraison
         Mail::to('kisama972@gmail')
             ->cc(['jacques.steeven@gmail.com'])
             ->send(new LivraisonMail($mailData, $storage, $url));
 
+        // Envoyer une notification après l'envoi du courrier électronique
         $this->sendNotification($order);
 
+        // Marquer la commande comme rapport délivré
         $order->report_delivered = 1;
         $order->report_delivered_date = now();
         $order->save();
 
+        // Rediriger vers le tableau de bord
         return redirect()->route('filament.admin.pages.dashboard');
     }
 
@@ -178,8 +194,10 @@ class PrintController extends Controller
      */
     private function sendNotification($order)
     {
+        // Récupérer le destinataire à partir de l'utilisateur actuel
         $recipient = auth()->user();
 
+        // Créer et envoyer la notification
         Notification::make()
             ->title('Mail envoyé avec succès le' . ' ' . $order->report_delivered_date)
             ->actions([
@@ -198,6 +216,7 @@ class PrintController extends Controller
      */
     public function ordersByMonth($month, $year)
     {
+        // Récupérer les commandes du mois spécifié
         $orders = Order::with('customer', 'items')
             ->whereMonth('published_at', $month)
             ->whereYear('published_at', $year)
@@ -205,9 +224,11 @@ class PrintController extends Controller
 
         $ordersData = [];
 
+        // Parcourir les commandes pour obtenir les détails
         foreach ($orders as $order) {
             $orderData = [];
 
+            // Parcourir les articles de la commande pour obtenir les détails du produit
             foreach ($order->items as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
@@ -220,9 +241,11 @@ class PrintController extends Controller
                 }
             }
 
+            // Formater les dates de création et de livraison de la commande
             $formattedCreationDate = $order->getFormattedPublishedDate();
             $formattedDeliveredDate = $order->getFormattedDeliveredDate();
 
+            // Stocker les données de la commande
             $ordersData[] = [
                 'Order ID' => $order->id,
                 'Order Number' => $order->number,
@@ -233,6 +256,7 @@ class PrintController extends Controller
             ];
         }
 
+        // Calculer la quantité totale commandée
         $totalQuantity = 0;
 
         foreach ($ordersData as $order) {
@@ -243,9 +267,13 @@ class PrintController extends Controller
             }
         }
 
+        // Traduire le numéro du mois en français
         $monthName = $this->translateToFrench($month, 'month');
+
+        // Récupérer les informations du mois à partir du modèle Month
         $MonthTable = Month::where('month_number', $month)->where('year', $year)->first();
 
+        // Charger la vue PDF pour le rapport par mois
         $pdf = PDF::loadView('pages.rapport.pdf.orders_by_month', [
             'monthName' => $monthName,
             'year' => $year,
@@ -253,23 +281,37 @@ class PrintController extends Controller
             'totalQuantity' => $totalQuantity,
         ]);
 
+        // Définir le nom du fichier PDF et le répertoire de sauvegarde
         $pdfFileName = $month . '-' . $year . '.pdf';
         $pdfDirectory = "pdf/{$year}/rapport-mensuel/";
         $fullPdfDirectory = storage_path("app/public/{$pdfDirectory}");
 
+        // Créer le répertoire s'il n'existe pas
         if (!file_exists($fullPdfDirectory)) {
             mkdir($fullPdfDirectory, 0755, true);
         }
 
+        // Définir le chemin complet du fichier PDF
         $pdfPath = $fullPdfDirectory . $pdfFileName;
+
+        // Sauvegarder le PDF
         $pdf->save($pdfPath);
 
+        // Retourner le PDF à diffuser en streaming
         return $pdf->stream($pdfFileName);
     }
 
+    /**
+     * Traduire une valeur en français en fonction du type (mois, jour de la semaine, etc.)
+     *
+     * @param mixed $value
+     * @param string $type
+     * @return string
+     */
     public function translateToFrench($value, $type)
     {
         if ($type === 'month') {
+            // Tableau de correspondance des mois en français
             $months = [
                 1 => 'Janvier',
                 2 => 'Février',
@@ -285,8 +327,10 @@ class PrintController extends Controller
                 12 => 'Décembre',
             ];
 
+            // Retourner le mois correspondant en français
             return $months[$value] ?? '';
         } elseif ($type === 'dayOfWeek') {
+            // Tableau de correspondance des jours de la semaine en français
             $daysOfWeek = [
                 0 => 'dimanche',
                 1 => 'lundi',
@@ -297,6 +341,7 @@ class PrintController extends Controller
                 6 => 'samedi',
             ];
 
+            // Retourner le jour de la semaine correspondant en français
             return $daysOfWeek[$value] ?? '';
         }
 
