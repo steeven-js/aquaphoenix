@@ -6,6 +6,7 @@ use App\Models\Shop\Order;
 use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use App\Http\Controllers\MonthController;
+use App\Http\Controllers\OrderController;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Notifications\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
@@ -36,9 +37,17 @@ class CreateOrder extends CreateRecord
             ])
             ->sendToDatabase(auth()->user());
 
-        // Mise à jour du numéro de commande
-        // $order->number = 'CMD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
-        // $order->save();
+        // Mise à jour du numéro de commande en prenant l'ID de la dernière commande créée + 1
+        $order->number = 'CMD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+        $order->save();
+
+        // Sécurité pour le numéro de commande
+        $checkNumber = new OrderController;
+        $checkNumber->updateNumber();
+
+        // Mise à jour du statut des commandes
+        $updateStatus = new OrderController;
+        $updateStatus->updateOrderStatus();
 
         // Mise à jour du mois
         $updateMonth = new MonthController;
