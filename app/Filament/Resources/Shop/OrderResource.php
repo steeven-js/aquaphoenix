@@ -287,7 +287,10 @@ class OrderResource extends Resource
         }
 
         return [
-
+            Forms\Components\TextInput::make('number')
+                ->label('Numéro de commande')
+                ->disabled()
+                ->default('CMD-' . str_pad(Order::query()->count() + 1, 4, '0', STR_PAD_LEFT)),
             Forms\Components\Select::make('customer_id')
                 ->label('Client')
                 ->relationship('customer', 'name')

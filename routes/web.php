@@ -34,6 +34,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/test/month', [MonthController::class, 'month'])->name('month.test');
     Route::get('/test/updateOrderStatus', [OrderController::class, 'updateOrderStatus'])->name('order.satus.test');
 
+    Route::get('/generate/generateAllPdfs', [OrderController::class, 'generateAllPdfs'])->name('generate.pdf');
+    Route::get('/generate/generateAllOrdersByMonthPdfs', [OrderController::class, 'generateAllOrdersByMonthPdfs'])->name('generate.monthOrders.pdf');
+
+    Route::get('/test/updateNumber', [OrderController::class, 'updateNumber'])->name('number');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

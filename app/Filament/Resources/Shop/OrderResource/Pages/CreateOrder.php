@@ -29,7 +29,7 @@ class CreateOrder extends CreateRecord
         Notification::make()
             ->title('Nouvelle commande')
             ->icon('heroicon-o-shopping-bag')
-            ->body("** Commande {$order->number} créée pour le client {$order->customer->name}**")
+            ->body("** Commande {$order->id} créée pour le client {$order->customer->name}**")
             ->actions([
                 Action::make('View')
                     ->url(OrderResource::getUrl('edit', ['record' => $order])),
@@ -37,8 +37,8 @@ class CreateOrder extends CreateRecord
             ->sendToDatabase(auth()->user());
 
         // Mise à jour du numéro de commande
-        $order->number = 'CMD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
-        $order->save();
+        // $order->number = 'CMD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+        // $order->save();
 
         // Mise à jour du mois
         $updateMonth = new MonthController;

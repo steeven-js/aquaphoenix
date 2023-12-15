@@ -20,12 +20,6 @@ use App\Notifications\ReportDeliveredNotification;
 
 class OrderController extends Controller
 {
-    /**
-     * Générer le rapport de livraison et le sauvegarder dans le dossier storage/app/public/pdf
-     *
-     * @param Order $order
-     * @return array
-     */
     public function generatePdf(Order $order)
     {
         $order = Order::with('customer', 'items')->findOrFail($order->id);
@@ -154,70 +148,6 @@ class OrderController extends Controller
         return $pdf->stream($pdfFileName);
     }
 
-    public function translateToFrench($value, $type)
-    {
-        if ($type === 'month') {
-            $months = [
-                1 => 'Janvier',
-                2 => 'Février',
-                3 => 'Mars',
-                4 => 'Avril',
-                5 => 'Mai',
-                6 => 'Juin',
-                7 => 'Juillet',
-                8 => 'Août',
-                9 => 'Septembre',
-                10 => 'Octobre',
-                11 => 'Novembre',
-                12 => 'Décembre',
-            ];
-
-            return $months[$value] ?? '';
-        } elseif ($type === 'dayOfWeek') {
-            $daysOfWeek = [
-                0 => 'dimanche',
-                1 => 'lundi',
-                2 => 'mardi',
-                3 => 'mercredi',
-                4 => 'jeudi',
-                5 => 'vendredi',
-                6 => 'samedi',
-            ];
-
-            return $daysOfWeek[$value] ?? '';
-        }
-
-        return '';
-    }
-
-    public function updateOrderStatus()
-    {
-        $orders = Order::all();
-
-        foreach ($orders as $order) {
-            $originalStatus = $order->status;
-
-            if ($order->delivered_date <= Carbon::now()->toDateString()) {
-                $order->status = 'livré';
-                $order->save();
-
-                if ($order->status !== $originalStatus) {
-                    $recipient = auth()->user();
-
-                    Notification::make()
-                        ->title('La commande ' . $order->number . ' est livrée')
-                        ->actions([
-                            Action::make('Voir')
-                                ->url(OrderResource::getUrl('edit', ['record' => $order])),
-                        ])
-                        ->sendToDatabase($recipient);
-                }
-            }
-        }
-
-        return redirect()->route('filament.admin.resources.shop.orders.index');
-    }
-
     private function getOrderData(Order $order)
     {
         $orderData = [];
@@ -302,4 +232,97 @@ class OrderController extends Controller
 
         return $totalQuantity;
     }
+
+    public function translateToFrench($value, $type)
+    {
+        if ($type === 'month') {
+            $months = [
+                1 => 'Janvier',
+                2 => 'Février',
+                3 => 'Mars',
+                4 => 'Avril',
+                5 => 'Mai',
+                6 => 'Juin',
+                7 => 'Juillet',
+                8 => 'Août',
+                9 => 'Septembre',
+                10 => 'Octobre',
+                11 => 'Novembre',
+                12 => 'Décembre',
+            ];
+
+            return $months[$value] ?? '';
+        } elseif ($type === 'dayOfWeek') {
+            $daysOfWeek = [
+                0 => 'dimanche',
+                1 => 'lundi',
+                2 => 'mardi',
+                3 => 'mercredi',
+                4 => 'jeudi',
+                5 => 'vendredi',
+                6 => 'samedi',
+            ];
+
+            return $daysOfWeek[$value] ?? '';
+        }
+
+        return '';
+    }
+
+    public function updateOrderStatus()
+    {
+        $orders = Order::all();
+
+        foreach ($orders as $order) {
+            $originalStatus = $order->status;
+
+            if ($order->delivered_date <= Carbon::now()->toDateString()) {
+                $order->status = 'livré';
+                $order->save();
+
+                if ($order->status !== $originalStatus) {
+                    $recipient = auth()->user();
+
+                    Notification::make()
+                        ->title('La commande ' . $order->number . ' est livrée')
+                        ->actions([
+                            Action::make('Voir')
+                                ->url(OrderResource::getUrl('edit', ['record' => $order])),
+                        ])
+                        ->sendToDatabase($recipient);
+                }
+            }
+        }
+
+        return redirect()->route('filament.admin.resources.shop.orders.index');
+    }
+
+    public function generateAllPdfs()
+    {
+        $orders = Order::all();
+
+        foreach ($orders as $order) {
+            $this->generatePdf($order);
+        }
+    }
+
+    public function generateAllOrdersByMonthPdfs()
+    {
+        $months = Month::where('count', '>', 0)->get();
+
+        foreach ($months as $month) {
+            $this->ordersByMonth($month->month_number, $month->year);
+        }
+    }
+
+    public function updateNumber()
+    {
+        $orders = Order::all();
+
+        foreach ($orders as $order) {
+            $order->number = 'CMD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+            $order->save();
+        }
+    }
+
 }
