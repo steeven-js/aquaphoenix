@@ -25,6 +25,7 @@ return new class() extends Migration
             $table->boolean('report_delivered')->default(false);
             $table->date('report_delivered_date')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

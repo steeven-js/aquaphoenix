@@ -160,19 +160,16 @@ class OrderResource extends Resource
                     ->iconPosition(IconPosition::After),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('Imprimer')
-                    ->url(fn (Order $record): string => route('livraison.print', $record))
-                    ->button()
-                    ->color('danger')
-                    ->icon('heroicon-o-document-arrow-up')
-                    ->iconPosition(IconPosition::Before),
-                Tables\Actions\Action::make('Envoyer mail')
-                    ->url(fn (Order $record): string => route('livraison.mail', $record))
-                    ->button()
-                    ->color('primary')
-                    ->icon('heroicon-o-envelope')
-                    ->iconPosition(IconPosition::Before),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('Imprimer')
+                        ->url(fn (Order $record): string => route('livraison.print', $record))
+                        ->icon('heroicon-o-document-arrow-up'),
+                    Tables\Actions\Action::make('Envoyer mail')
+                        ->url(fn (Order $record): string => route('livraison.mail', $record))
+                        ->icon('heroicon-o-envelope'),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->groupedBulkActions([
                 Tables\Actions\DeleteBulkAction::make()
@@ -219,7 +216,7 @@ class OrderResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScope(SoftDeletingScope::class);
+        return parent::getEloquentQuery()->withoutGlobalScope('WithoutTrashed');
     }
 
     public static function getGloballySearchableAttributes(): array
@@ -290,7 +287,7 @@ class OrderResource extends Resource
             Forms\Components\TextInput::make('number')
                 ->label('Numéro de commande')
                 ->disabled()
-                ->default('CMD-' . str_pad(Order::query()->count() + 1, 4, '0', STR_PAD_LEFT)),
+                ->default('CMD-' . str_pad(Order::latest('id')->pluck('id')->first() + 1, 4, '0', STR_PAD_LEFT)),
             Forms\Components\Select::make('customer_id')
                 ->label('Client')
                 ->relationship('customer', 'name')
