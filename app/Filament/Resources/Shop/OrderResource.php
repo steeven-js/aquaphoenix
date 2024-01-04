@@ -89,6 +89,7 @@ class OrderResource extends Resource
                         'en progression' => 'warning',
                         'livré' => 'success',
                         'annulé' => 'danger',
+                        'supprimé' => 'danger',
                     }),
 
                 Tables\Columns\TextColumn::make('published_at')
@@ -332,6 +333,7 @@ class OrderResource extends Resource
                     'en progression' => 'en progression',
                     'livré' => 'livré',
                     'annulé' => 'annulé',
+                    'supprimé' => 'supprimé',
                 ])
                 ->default('en progression')
                 ->required()
