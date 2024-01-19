@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Month;
 use App\Models\Shop\Order;
-use App\Models\OrderByMonth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;

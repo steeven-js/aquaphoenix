@@ -41,10 +41,6 @@ class MonthResource extends Resource
                     ->disabled(),
                 TextInput::make('month')
                     ->disabled(),
-                TextInput::make('start_date')
-                    ->disabled(),
-                TextInput::make('end_date')
-                    ->disabled(),
                 TextInput::make('count')
                     ->disabled(),
             ]);
@@ -90,7 +86,7 @@ class MonthResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\OrdersRelationManager::class,
+            //
         ];
     }
 

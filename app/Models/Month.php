@@ -19,14 +19,4 @@ class Month extends Model
         'count',
         'report_created_at',
     ];
-
-    public function orders()
-    {
-        return $this->hasManyThrough(Order::class, OrderByMonth::class, 'month_id', 'id', 'id', 'order_id');
-    }
-
-    public function ordersByMonth()
-    {
-        return $this->hasMany(OrderByMonth::class);
-    }
 }
