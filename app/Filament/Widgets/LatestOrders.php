@@ -24,6 +24,7 @@ class LatestOrders extends BaseWidget
             ->defaultSort('published_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('number')
+                    ->label('Numéro de commande')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('published_at')
@@ -32,9 +33,11 @@ class LatestOrders extends BaseWidget
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer.name')
+                    ->label('Client')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->label('Statut')
                     ->color(fn (string $state): string => match ($state) {
                         'en progression' => 'warning',
                         'livré' => 'success',
@@ -58,7 +61,8 @@ class LatestOrders extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\Action::make('open')
-                    ->url(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record])),
+                    ->url(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record]))
+                    ->label('Ouvrir'),
             ]);
     }
 }

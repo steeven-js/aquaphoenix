@@ -16,9 +16,6 @@ return new class extends Migration
             $table->string('year')->nullable();
             $table->string('month')->nullable();
             $table->string('month_number')->nullable();
-            $table->string('start_date')->nullable();
-            $table->string('end_date')->nullable();
-
             $table->integer('count')->default(0)->nullable();
             $table->timestamp('report_created_at')->nullable();
             $table->timestamps();

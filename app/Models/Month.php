@@ -15,8 +15,9 @@ class Month extends Model
     protected $fillable = [
         'year',
         'month',
-        'start_date',
-        'end_date',
+        'month_number',
+        'count',
+        'report_created_at',
     ];
 
     public function orders()
