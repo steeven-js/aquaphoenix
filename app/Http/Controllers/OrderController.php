@@ -161,6 +161,7 @@ class OrderController extends Controller
                     'Product Name' => $product->name,
                     'Description' => $product->description,
                     'Quantity' => $item->qty,
+                    'Notes' => $item->notes ?? '',
                 ];
             }
         }
