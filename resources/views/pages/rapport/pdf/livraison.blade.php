@@ -170,15 +170,20 @@
             </tr>
 
             @forelse ($orderData as $item)
-                {{-- @dump($item) --}}
                 <tr class="item">
                     <td>{{ $item['Product Name'] }}</td>
-
                     <td>{{ $item['Quantity'] }} kg</td>
                 </tr>
+
+                @if ($orderNotes)
+                    <tr class="item">
+                        <td>Notes: {{ $orderNotes }}</td>
+                    </tr>
+                @endif
             @empty
                 <p>Aucun produit à livrer</p>
             @endforelse
+
 
             <tr class="total">
                 <td></td>

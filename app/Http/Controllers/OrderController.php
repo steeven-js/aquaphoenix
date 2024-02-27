@@ -28,8 +28,11 @@ class OrderController extends Controller
         $totalQuantity = $this->calculateTotalQuantity($orderData);
         $formattedCreationDate = $order->getFormattedPublishedDate();
         $formattedDeliveredDate = $order->getFormattedDeliveredDate();
+        $orderNotes = $order->notes;
 
-        $pdf = PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity'));
+        $pdf = PDF::loadView('pages.rapport.pdf.livraison', compact('order', 'orderData', 'formattedCreationDate', 'formattedDeliveredDate', 'totalQuantity', 'orderNotes'));
+
+        // dd($order);
 
         $pdfPath = $this->savePdf($pdf, $order, $year);
 
@@ -41,6 +44,7 @@ class OrderController extends Controller
             'pdfPath' => $pdfPath,
             'storage' => Storage::url($pdfPath),
             'url' => $order->url,
+            'orderNotes' => $orderNotes,
         ];
     }
 
@@ -161,9 +165,12 @@ class OrderController extends Controller
                     'Product Name' => $product->name,
                     'Description' => $product->description,
                     'Quantity' => $item->qty,
+                    'Notes' => $order->notes,
                 ];
             }
         }
+
+        // dd($orderData);
 
         return $orderData;
     }
