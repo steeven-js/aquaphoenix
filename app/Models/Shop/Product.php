@@ -2,8 +2,9 @@
 
 namespace App\Models\Shop;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
@@ -24,4 +25,9 @@ class Product extends Model
         'is_visible',
         'published_at',
     ];
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(OrderItem::class, 'product_id');
+    }
 }
