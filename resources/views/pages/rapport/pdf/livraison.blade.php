@@ -170,37 +170,20 @@
             </tr>
 
             @forelse ($orderData as $item)
-                {{-- @dump($item) --}}
                 <tr class="item">
                     <td>{{ $item['Product Name'] }}</td>
-
                     <td>{{ $item['Quantity'] }} kg</td>
                 </tr>
 
-                <tr class="item">
-                    <td>{{ $item['Notes'] }}</td>
-                </tr>
+                @if ($orderNotes)
+                    <tr class="item">
+                        <td>Notes: {{ $orderNotes }}</td>
+                    </tr>
+                @endif
             @empty
                 <p>Aucun produit à livrer</p>
             @endforelse
 
-            @if ($item['Notes'])
-                <tr class="heading">
-                    <td>Notes</td>
-                </tr>
-            @endif
-
-            @if ($item['Notes'])
-
-                @forelse ($orderData as $item)
-                    <tr class="item">
-                        <td>{{ $item['Notes'] }}</td>
-                    </tr>
-                @empty
-                    <p>Aucunes notes</p>
-                @endforelse
-
-            @endif
 
             <tr class="total">
                 <td></td>
