@@ -42,7 +42,7 @@ class MonthController extends Controller
         $months = Order::query()
             ->select(DB::raw('DISTINCT YEAR(delivered_date) as year, MONTH(delivered_date) as month'))
             ->whereNotNull('delivered_date')
-            ->where('status', 'livré')
+            ->where('status', '=', 'livré')
             ->orderBy('year')
             ->orderBy('month')
             ->get();
