@@ -25,6 +25,6 @@ class AppServiceProvider extends ServiceProvider
         Order::observe(OrderObserver::class);
 
         // Initialiser les statistiques mensuelles
-        MonthController::initializeAllMonths();
+        // MonthController::initializeAllMonths();
     }
 }
