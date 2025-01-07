@@ -20,7 +20,7 @@ class MonthController extends Controller
         $count = Order::query()
             ->whereYear('delivered_date', $year)
             ->whereMonth('delivered_date', $month)
-            ->where('status', 'livré')
+            ->where('status', '=', 'livré')
             ->count();
 
         Month::updateOrCreate(
