@@ -3,44 +3,90 @@
 namespace App\Http\Controllers;
 
 use App\Models\Month;
-use App\Models\Shop\Order;
-use Illuminate\Http\Request;
+use App\Models\Order;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
 
 class MonthController extends Controller
 {
-    /**
-     * Méthode pour mettre à jour les données de mois
-     *
-     * @return void
-     */
-    public function month()
+    public static function updateMonthStats(?string $month = null, ?string $year = null): void
     {
-        // Obtention de tous les orders avec le comptage par année et mois
-        $orders = Order::select([
-            DB::raw('YEAR(created_at) as year'),
-            DB::raw('MONTH(created_at) as month_number'),
-            DB::raw('COUNT(*) as count')
-        ])
-            ->groupBy('year', 'month_number')
-            ->get();
-
-        foreach ($orders as $order) {
-            // Recherche ou création du mois
-            $month = Month::firstOrNew([
-                'year' => $order->year,
-                'month_number' => $order->month_number
-            ]);
-
-            // Mise à jour des données
-            $month->fill([
-                'month' => Carbon::createFromDate($order->year, $order->month_number, 1)->locale('fr')->monthName,
-                'count' => $order->count,
-            ])->save();
+        if (!$month || !$year) {
+            $date = Carbon::now();
+            $month = $date->format('m');
+            $year = $date->format('Y');
         }
 
-        return redirect()->route('filament.admin.pages.dashboard');
+        $count = Order::query()
+            ->whereYear('delivered_date', $year)
+            ->whereMonth('delivered_date', $month)
+            ->where('status', 'livré')
+            ->count();
+
+        Month::updateOrCreate(
+            [
+                'year' => $year,
+                'month_number' => $month,
+            ],
+            [
+                'month' => Carbon::createFromDate($year, $month, 1)->locale('fr')->monthName,
+                'count' => $count,
+                'report_created_at' => now(),
+            ]
+        );
+    }
+
+    public static function initializeAllMonths(): void
+    {
+        // Récupérer tous les mois distincts où il y a des commandes
+        $months = Order::query()
+            ->select(DB::raw('DISTINCT YEAR(delivered_date) as year, MONTH(delivered_date) as month'))
+            ->whereNotNull('delivered_date')
+            ->where('status', 'livré')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
+        // Mettre à jour les statistiques pour chaque mois
+        foreach ($months as $monthData) {
+            self::updateMonthStats(
+                str_pad($monthData->month, 2, '0', STR_PAD_LEFT),
+                $monthData->year
+            );
+        }
+    }
+
+    public static function initializeCurrentAndLastMonth(): void
+    {
+        $currentDate = Carbon::now();
+        $lastMonth = Carbon::now()->subMonth();
+
+        self::updateMonthStats(
+            $currentDate->format('m'),
+            $currentDate->format('Y')
+        );
+
+        self::updateMonthStats(
+            $lastMonth->format('m'),
+            $lastMonth->format('Y')
+        );
+    }
+
+    public function month(): void
+    {
+        $currentDate = Carbon::now();
+        $lastMonth = Carbon::now()->subMonth();
+
+        // Mettre à jour le mois en cours
+        $this->updateMonthStats(
+            $currentDate->format('m'),
+            $currentDate->format('Y')
+        );
+
+        // Mettre à jour le mois précédent
+        $this->updateMonthStats(
+            $lastMonth->format('m'),
+            $lastMonth->format('Y')
+        );
     }
 }

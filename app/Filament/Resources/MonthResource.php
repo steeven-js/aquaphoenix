@@ -8,7 +8,6 @@ use App\Models\Month;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\IconPosition;
@@ -51,6 +50,8 @@ class MonthResource extends Resource
         $table->query(
             fn (): Builder => Month::query()
                 ->where('count', '>', '0')
+                ->orderByDesc('year')
+                ->orderByDesc('month_number')
         );
 
         return $table

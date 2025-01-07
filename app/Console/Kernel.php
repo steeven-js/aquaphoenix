@@ -9,16 +9,23 @@ class Kernel extends ConsoleKernel
 {
     /**
      * Define the application's command schedule.
+     *
+     * These should be classes that implement the ShouldQueue interface.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @return void
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('orders:check-delivery-status')->hourly();
     }
 
     /**
-     * Register the commands for the application.
+     * Register the commands for your application.
+     *
+     * @return void
      */
-    protected function commands(): void
+    protected function commands()
     {
         $this->load(__DIR__.'/Commands');
 

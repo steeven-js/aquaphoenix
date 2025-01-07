@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Order;
+use App\Observers\OrderObserver;
+use App\Http\Controllers\MonthController;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-        Schema::defaultStringLength(191);
+        Order::observe(OrderObserver::class);
+
+        // Initialiser les statistiques mensuelles
+        MonthController::initializeAllMonths();
     }
 }

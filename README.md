@@ -1,51 +1,66 @@
-## Aquaphoenix
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-Génération de bon de livraison et autres
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-![Aquaphoenix - Dark Mode](https://firebasestorage.googleapis.com/v0/b/dashboard-f3222.appspot.com/o/Tableau%20de%20bord%20-%20Aquaphoenix1.png?alt=media&token=59d08432-43ba-48f2-b833-0b83f0e5e24a)
+## About Laravel
 
-![Aquaphoenix - Light Mode](https://firebasestorage.googleapis.com/v0/b/dashboard-f3222.appspot.com/o/Tableau%20de%20bord%20-%20Aquaphoenix2.png?alt=media&token=c0af385f-1ac2-4eb0-9f34-266d9c140841)
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-## **Projet Aquaphoenix**
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-[Aquaphoenix](https://aquaphoenix.jsprod.fr/) Lien du projet.
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-### Technologies Utilisées
+## Learning Laravel
 
-- **Laravel**: Framework PHP moderne et puissant.
-- **Filament**: Interface d'administration élégante pour Laravel.
-- **Breeze**: Authetification.
-- **domPDF**: Bibliothèque pour la génération de fichiers PDF depuis des vues HTML.
-- **SQL**: Langage de requête pour la gestion des bases de données relationnelles.
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-### Fonctionnalités Principales
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-1. **Espace Admin avec FilamentPHP**
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-   - Utilisation de FilamentPHP pour une interface d'administration intuitive.
+## Laravel Sponsors
 
-2. **Génération et Sauvegarde de Bon de Livraison en PDF**
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-   - Utilisation de domPDF pour générer des bons de livraison au format PDF.
+### Premium Partners
 
-3. **Rapport Mensuel**
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
 
-   - Tableau de bord affichant les livraisons du mois précédent, du mois en cours, et le poids total du mois en cours.
+## Contributing
 
-4. **Tableau de Bords**
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-   - Création d'un tableau de bord comprenant des statistiques clés.
-   - Affichage du nombre de livraisons du mois précédent, du mois en cours, et du poids total en kg pour le mois en cours.
+## Code of Conduct
 
-5. **Graphiques Statistiques**
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-   - Graphique illustrant les livraisons par mois.
-   - Graphique représentant le total des poids (en kg) par mois.
+## Security Vulnerabilities
 
-6. **Gestion des Données**
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-   - Création, modification et suppression de désignations, clients et livraisons.
+## License
 
-7. **Rapport des Livraisons par Mois**
-
-   - Génération automatisée d'un rapport détaillé des livraisons par mois.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
