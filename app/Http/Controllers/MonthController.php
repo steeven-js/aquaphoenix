@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Month;
 use App\Models\Order;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class MonthController extends Controller
 {
@@ -41,8 +42,10 @@ class MonthController extends Controller
         $months = Order::query()
             ->whereNotNull('delivered_date')
             ->where('status', '=', 'livré')
-            ->selectRaw('DISTINCT YEAR(delivered_date) as year')
-            ->selectRaw('MONTH(delivered_date) as month')
+            ->select([
+                DB::raw('DISTINCT YEAR(delivered_date) as year'),
+                DB::raw('MONTH(delivered_date) as month')
+            ])
             ->orderBy('year')
             ->orderBy('month')
             ->get();
