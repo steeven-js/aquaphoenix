@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Month;
 use App\Models\Order;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class MonthController extends Controller
 {
@@ -40,9 +39,10 @@ class MonthController extends Controller
     {
         // Récupérer tous les mois distincts où il y a des commandes
         $months = Order::query()
-            ->select(DB::raw('DISTINCT YEAR(delivered_date) as year, MONTH(delivered_date) as month'))
             ->whereNotNull('delivered_date')
             ->where('status', '=', 'livré')
+            ->selectRaw('DISTINCT YEAR(delivered_date) as year')
+            ->selectRaw('MONTH(delivered_date) as month')
             ->orderBy('year')
             ->orderBy('month')
             ->get();
@@ -74,19 +74,6 @@ class MonthController extends Controller
 
     public function month(): void
     {
-        $currentDate = Carbon::now();
-        $lastMonth = Carbon::now()->subMonth();
-
-        // Mettre à jour le mois en cours
-        $this->updateMonthStats(
-            $currentDate->format('m'),
-            $currentDate->format('Y')
-        );
-
-        // Mettre à jour le mois précédent
-        $this->updateMonthStats(
-            $lastMonth->format('m'),
-            $lastMonth->format('Y')
-        );
+        $this->initializeCurrentAndLastMonth();
     }
 }
