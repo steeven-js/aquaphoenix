@@ -11,14 +11,28 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Address;
 
+/**
+ * Classe pour l'envoi des bons de livraison par email
+ */
 class DeliveryNoteMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * Crée une nouvelle instance du mail
+     *
+     * @param Order $order La commande concernée
+     * @param string $pdfPath Le chemin vers le fichier PDF du bon de livraison
+     */
     public function __construct(public Order $order, public string $pdfPath)
     {
     }
 
+    /**
+     * Configure l'enveloppe du mail
+     *
+     * @return Envelope
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -29,6 +43,11 @@ class DeliveryNoteMail extends Mailable
         );
     }
 
+    /**
+     * Configure le contenu du mail
+     *
+     * @return Content
+     */
     public function content(): Content
     {
         return new Content(
@@ -40,6 +59,11 @@ class DeliveryNoteMail extends Mailable
         );
     }
 
+    /**
+     * Configure les pièces jointes du mail
+     *
+     * @return array<int, Attachment>
+     */
     public function attachments(): array
     {
         return [

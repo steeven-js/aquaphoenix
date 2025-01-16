@@ -11,26 +11,40 @@ use App\Http\Controllers\MonthController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Classe pour gérer la création d'une nouvelle commande
+ */
 class CreateOrder extends CreateRecord
 {
+    /**
+     * Définit la classe de ressource associée
+     */
     protected static string $resource = OrderResource::class;
 
+    /**
+     * Actions à effectuer après la création d'une commande
+     * - Met à jour la commande précédente comme livrée
+     * - Génère le bon de livraison
+     * - Envoie des notifications
+     * - Met à jour les statistiques mensuelles
+     */
     protected function afterCreate(): void
     {
         $order = $this->record;
 
-        // Mettre à jour la commande précédente comme livrée
+        // Recherche de la dernière commande non livrée
         $previousOrder = Order::where('id', '<', $order->id)
             ->where('status', '!=', 'livré')
             ->latest()
             ->first();
 
+        // Si une commande précédente existe, la marquer comme livrée
         if ($previousOrder) {
             $previousOrder->status = 'livré';
             $previousOrder->delivered_date = now();
             $previousOrder->save();
 
-            // Notification pour la commande précédente
+            // Envoi d'une notification pour la mise à jour de la commande précédente
             Notification::make()
                 ->warning()
                 ->title('Commande précédente mise à jour')
@@ -43,11 +57,11 @@ class CreateOrder extends CreateRecord
                 ->sendToDatabase(Auth::user());
         }
 
-        // Générer le bon de livraison
+        // Génération du bon de livraison pour la nouvelle commande
         $orderController = new OrderController();
         $orderController->generateDeliveryNote($order);
 
-        // Notification pour la nouvelle commande
+        // Envoi d'une notification pour la création de la nouvelle commande
         Notification::make()
             ->title('Nouvelle commande')
             ->icon('heroicon-o-shopping-cart')
@@ -61,10 +75,15 @@ class CreateOrder extends CreateRecord
             ])
             ->sendToDatabase(Auth::user());
 
-        // Mise à jour des statistiques mensuelles
+        // Mise à jour des statistiques mensuelles globales
         MonthController::initializeAllMonths();
     }
 
+    /**
+     * Définit l'URL de redirection après la création
+     *
+     * @return string URL de la liste des commandes
+     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

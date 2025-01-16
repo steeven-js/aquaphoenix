@@ -10,6 +10,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour gérer les produits/désignations
+ */
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
@@ -26,6 +29,12 @@ class ProductResource extends Resource
 
     protected static ?int $navigationSort = 0;
 
+    /**
+     * Définit le formulaire de création/édition des produits
+     *
+     * @param Form $form Le formulaire à configurer
+     * @return Form Le formulaire configuré
+     */
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -44,6 +53,12 @@ class ProductResource extends Resource
         ]);
     }
 
+    /**
+     * Définit la table de liste des produits
+     *
+     * @param Table $table La table à configurer
+     * @return Table La table configurée
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -76,6 +91,11 @@ class ProductResource extends Resource
             ]);
     }
 
+    /**
+     * Définit les pages disponibles pour cette ressource
+     *
+     * @return array Les routes des pages
+     */
     public static function getPages(): array
     {
         return [

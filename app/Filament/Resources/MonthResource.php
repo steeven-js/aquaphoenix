@@ -16,6 +16,9 @@ use App\Filament\Resources\MonthResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MonthResource\RelationManagers;
 
+/**
+ * Ressource Filament pour gérer les rapports mensuels
+ */
 class MonthResource extends Resource
 {
     protected static ?string $model = Month::class;
@@ -32,6 +35,12 @@ class MonthResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Définit le formulaire de création/édition des rapports mensuels
+     *
+     * @param Form $form Le formulaire à configurer
+     * @return Form Le formulaire configuré
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -45,8 +54,15 @@ class MonthResource extends Resource
             ]);
     }
 
+    /**
+     * Définit la table de liste des rapports mensuels
+     *
+     * @param Table $table La table à configurer
+     * @return Table La table configurée
+     */
     public static function table(Table $table): Table
     {
+        // Filtre pour n'afficher que les mois avec des livraisons
         $table->query(
             fn (): Builder => Month::query()
                 ->where('count', '>', '0')
@@ -56,9 +72,11 @@ class MonthResource extends Resource
 
         return $table
             ->columns([
+                // Colonne du mois avec l'année en description
                 TextColumn::make('month')
                     ->label('Mois')
                     ->description(fn (Month $record): string => $record->year),
+                // Colonne du nombre de livraisons
                 TextColumn::make('count')
                     ->label('Nombre de livraisons du mois')
                     ->icon('heroicon-s-document-minus'),
@@ -67,6 +85,7 @@ class MonthResource extends Resource
                 //
             ])
             ->actions([
+                // Action pour imprimer le rapport mensuel
                 Tables\Actions\Action::make('Imprimer')
                     ->url(fn (Month $record): string => route('order.month.print', [
                         'month' => $record->month_number,
@@ -84,6 +103,11 @@ class MonthResource extends Resource
             ]);
     }
 
+    /**
+     * Définit les relations disponibles pour cette ressource
+     *
+     * @return array Les relations configurées
+     */
     public static function getRelations(): array
     {
         return [
@@ -91,6 +115,11 @@ class MonthResource extends Resource
         ];
     }
 
+    /**
+     * Définit les pages disponibles pour cette ressource
+     *
+     * @return array Les pages configurées
+     */
     public static function getPages(): array
     {
         return [

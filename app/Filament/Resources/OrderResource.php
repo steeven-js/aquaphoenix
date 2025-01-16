@@ -12,6 +12,9 @@ use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 
+/**
+ * Ressource Filament pour gérer les commandes/bons de livraison
+ */
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
@@ -28,9 +31,16 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Définit le formulaire de création/édition des commandes
+     *
+     * @param Form $form Le formulaire à configurer
+     * @return Form Le formulaire configuré
+     */
     public static function form(Form $form): Form
     {
         return $form->schema([
+            // Section des informations client
             Forms\Components\Section::make('Informations Client')
                 ->schema([
                     Forms\Components\Select::make('customer_id')
@@ -54,8 +64,10 @@ class OrderResource extends Resource
                         ->columnSpan('full'),
                 ])->columns(2),
 
+            // Section des détails de la commande
             Forms\Components\Section::make('Détails de la commande')
                 ->schema([
+                    // Numéro de commande auto-généré
                     Forms\Components\TextInput::make('number')
                         ->label('Numéro de commande')
                         ->default(function () {
@@ -66,6 +78,7 @@ class OrderResource extends Resource
                         ->disabled()
                         ->dehydrated()
                         ->required(),
+                    // Statut de la commande
                     Forms\Components\Select::make('status')
                         ->options([
                             'en progression' => 'En progression',
@@ -75,6 +88,7 @@ class OrderResource extends Resource
                         ->default('en progression')
                         ->required()
                         ->native(false),
+                    // Dates de publication et livraison
                     Forms\Components\DatePicker::make('published_at')
                         ->label('Date de publication')
                         ->default(now()),
@@ -82,6 +96,7 @@ class OrderResource extends Resource
                         ->label('Date de livraison'),
                 ])->columns(2),
 
+            // Section des produits commandés
             Forms\Components\Section::make('Produits')
                 ->schema([
                     Forms\Components\Repeater::make('items')
@@ -116,6 +131,7 @@ class OrderResource extends Resource
                         ->columns(2),
                 ]),
 
+            // Section des notes
             Forms\Components\Section::make('Notes')
                 ->schema([
                     Forms\Components\Textarea::make('notes')
@@ -131,10 +147,17 @@ class OrderResource extends Resource
         ]);
     }
 
+    /**
+     * Définit la table de liste des commandes
+     *
+     * @param Table $table La table à configurer
+     * @return Table La table configurée
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // Colonnes de la table
                 Tables\Columns\TextColumn::make('number')
                     ->label('N° Commande')
                     ->sortable()
@@ -160,6 +183,7 @@ class OrderResource extends Resource
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
+            // Filtres disponibles
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
@@ -168,6 +192,7 @@ class OrderResource extends Resource
                         'annulé' => 'Annulé',
                     ]),
             ])
+            // Actions sur les lignes
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
@@ -180,6 +205,7 @@ class OrderResource extends Resource
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
+            // Actions groupées
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -187,6 +213,11 @@ class OrderResource extends Resource
             ]);
     }
 
+    /**
+     * Définit les pages de la ressource
+     *
+     * @return array Les routes des pages
+     */
     public static function getPages(): array
     {
         return [

@@ -10,6 +10,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour gérer les clients
+ */
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -26,6 +29,12 @@ class CustomerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Définit le formulaire de création/édition des clients
+     *
+     * @param Form $form Le formulaire à configurer
+     * @return Form Le formulaire configuré
+     */
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -53,6 +62,12 @@ class CustomerResource extends Resource
         ]);
     }
 
+    /**
+     * Définit la table de liste des clients
+     *
+     * @param Table $table La table à configurer
+     * @return Table La table configurée
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -84,6 +99,11 @@ class CustomerResource extends Resource
             ]);
     }
 
+    /**
+     * Définit les pages disponibles pour cette ressource
+     *
+     * @return array Les pages configurées
+     */
     public static function getPages(): array
     {
         return [
