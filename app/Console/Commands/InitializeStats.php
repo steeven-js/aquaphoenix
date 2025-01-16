@@ -20,7 +20,7 @@ class InitializeStats extends Command
      *
      * @var string
      */
-    protected $description = 'Initialise les statistiques mensuelles';
+    protected $description = 'Initialise les statistiques mensuelles (exécution chaque minute)';
 
     /**
      * Exécute la commande console.
