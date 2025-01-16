@@ -23,8 +23,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Order::observe(OrderObserver::class);
-
-        // Initialiser les statistiques mensuelles
-        MonthController::initializeAllMonths();
     }
 }
