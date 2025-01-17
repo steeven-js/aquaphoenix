@@ -9,5 +9,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 
-Schedule::command('stats:initialize')->everyMinute();
+Schedule::command('stats:initialize')->everyMinute()->appendOutputTo(storage_path('logs/stats-initialize.log'));
 
