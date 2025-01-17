@@ -27,7 +27,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('stats:initialize')->everyMinute();
+        $schedule->command('stats:initialize')
+            ->everyMinute()
+            ->appendOutputTo(storage_path('logs/stats-initialize.log'));
     }
 
     /**
@@ -37,7 +39,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
