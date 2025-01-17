@@ -38,7 +38,7 @@ class EditOrder extends EditRecord
                         ->url(OrderResource::getUrl('edit', ['record' => $order])),
                 ])
                 ->sendToDatabase(\Illuminate\Support\Facades\Auth::user());
-            }
+        }
 
         // Mise à jour des stats si la date de livraison a changé
         if ($order->wasChanged('delivered_date')) {
@@ -47,6 +47,9 @@ class EditOrder extends EditRecord
                 \Carbon\Carbon::parse($order->delivered_date)->format('Y')
             );
         }
+
+        // Mise à jour des statistiques mensuelles globales
+        MonthController::initializeAllMonths();
     }
 
     /**
