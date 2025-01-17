@@ -28,8 +28,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('stats:initialize')
-            ->everyMinute()
-            ->appendOutputTo(storage_path('logs/stats-initialize.log'));
+            ->everyMinute();
     }
 
     /**

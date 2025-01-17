@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MonthController;
+use Illuminate\Support\Facades\Log;
 
 class InitializeStats extends Command
 {
@@ -27,18 +27,16 @@ class InitializeStats extends Command
      */
     public function handle()
     {
-        Log::info('Démarrage de la commande stats:initialize');
         try {
-            $this->info('Début de l\'initialisation des statistiques mensuelles...');
-            Log::info('Début de l\'initialisation des statistiques mensuelles...');
+            Log::channel('stats')->info('Démarrage de la commande stats:initialize');
 
             MonthController::initializeAllMonths();
 
-            $this->info('Initialisation des statistiques terminée avec succès');
-            Log::info('Initialisation des statistiques terminée avec succès');
+            Log::channel('stats')->info('Initialisation terminée avec succès');
+            return 0;
         } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'initialisation des statistiques: ' . $e->getMessage());
-            $this->error('Une erreur est survenue: ' . $e->getMessage());
+            Log::channel('stats')->error('Erreur: ' . $e->getMessage());
+            return 1;
         }
     }
 }
